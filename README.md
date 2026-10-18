@@ -137,17 +137,31 @@ already supported).
 ## Going live
 
 ### 1. Database
-Use a managed **PostgreSQL 18** in the same region as the app (for example AWS RDS `af-south-1` in
+Use a managed **PostgreSQL 18** (required: the schema uses `uuidv7()`) in the same region as the app (for example AWS RDS `af-south-1` in
 Cape Town, DigitalOcean, Neon or Supabase). Turn on automated backups and point-in-time recovery. The
 worker image runs migrations on start.
 
 ### 2. App hosting (recommended: Node containers + Cloudflare in front)
 ```bash
-docker build --target web -t pesaflow-web .        # serves port 3000
-docker build --target worker -t pesaflow-worker .  # migrations + jobs; run at least 1
+docker build -t pesaflow-web .                           # serves port 3000
+docker build -f Dockerfile.worker -t pesaflow-worker .   # migrations + jobs; run at least 1
 ```
 Run both with the same environment variables (`JOBS_INLINE=0`) on any container host (DigitalOcean
 App Platform, Render, Fly.io, AWS ECS). Scale web horizontally; one or two workers are plenty.
+
+**Quickest: Render (recommended to start).** `render.yaml` sets up the website, the worker and a
+managed PostgreSQL 18 database in Frankfurt in one go (about USD 20/month on the smallest paid sizes):
+1. Put the code in a private GitHub repository.
+2. At render.com, sign up with GitHub and add a payment card.
+3. **New → Blueprint**, pick the repository, then **Apply**. The first deploy takes about 10 minutes.
+4. Open the `pesaflow` service's `https://….onrender.com` address. The app uses it automatically
+   (`RENDER_EXTERNAL_URL`); set `PUBLIC_URL` on both services once you have your own domain.
+
+Everything starts in mock mode (`MPESA_ENV`, `FLW_ENV`, `PADDLE_ENV`, `NOTIFY_ENV`): sign-ups work, but
+"payments" are simulated and anyone can unlock a plan for free, and reset codes only appear in the
+Render logs. Switch each one to live under **Environment** once that account is approved.
+Not suitable: Cloudflare Workers (no long-running worker, no native argon2) and shared web hosting
+(no Node.js / PostgreSQL 18). A plain VPS works, but you then run updates, backups and security yourself.
 
 ### 3. Cloudflare
 - Proxy the app's DNS record (orange cloud). Set SSL/TLS to **Full (strict)**.

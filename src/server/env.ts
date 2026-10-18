@@ -20,7 +20,8 @@ const oneOf = <const T extends readonly [string, ...string[]]>(values: T, def: T
 const schema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   APP_NAME: str("PesaFlow"),
-  PUBLIC_URL: str("http://localhost:3000"),
+  // On Render, the web service's own https://….onrender.com address is used until you set your domain.
+  PUBLIC_URL: str(process.env.RENDER_EXTERNAL_URL || "http://localhost:3000"),
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
   SESSION_DAYS: int(30),
   TRIAL_DAYS: int(14),

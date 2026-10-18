@@ -23,7 +23,7 @@ services:
   #   docker compose --profile full up --build
   app:
     profiles: ["full"]
-    build: { context: ., target: web }
+    build: { context: . }
     env_file: .env
     environment:
       DATABASE_URL: postgres://pesaflow:pesaflow_dev_only@db:5432/pesaflow
@@ -33,7 +33,7 @@ services:
       db: { condition: service_healthy }
   worker:
     profiles: ["full"]
-    build: { context: ., target: worker }
+    build: { context: ., dockerfile: Dockerfile.worker }
     env_file: .env
     environment:
       DATABASE_URL: postgres://pesaflow:pesaflow_dev_only@db:5432/pesaflow

@@ -123,6 +123,9 @@ export const nl: Messages = {
     manage: "Abonnement beheren", cancelSub: "Abonnement opzeggen", cardRenews: "Je kaartabonnement wordt automatisch verlengd.",
     cardCanceled: "Je kaartabonnement is opgezegd en wordt niet verlengd.",
     waysToPay: "Betaalmethoden in {country}", approxNote: "Bedragen met ≈ zijn een schatting tegen de wisselkoers van vandaag. Bij het afrekenen zie je de exacte prijs, inclusief btw.",
+    mobileTab: "Mobile money", payMobile: "Betalen met mobile money", mobileButton: "Doorgaan om {amount} te betalen",
+    mobileHint: "Je kiest je netwerk op de beveiligde pagina van Flutterwave en keurt de betaling goed op je telefoon. Prepaid: wordt niet automatisch verlengd.",
+    mobileWaiting: "Wachten op bevestiging van je mobile-moneybetaling…",
   },
   settings: {
     thisBudget: "Dit budget", horizon: "Dagen vooruitkijken", horizonHint: "De oorspronkelijke spreadsheet kijkt 31 dagen vooruit.",
@@ -200,5 +203,7 @@ export const nl: Messages = {
     currencyInvalid: "Kies een geldige valuta.", localeInvalid: "Kies een ondersteunde taal.",
     cardUnavailable: "Betalen met kaart is nog niet beschikbaar.",
     cardSubscriptionActive: "Je hebt al een actief kaartabonnement. Beheer het via Instellingen.",
+    mobileMoneyUnavailable: "Mobile money is nog niet beschikbaar in jouw land.",
+    mobileMoneyTimeout: "De mobile-moneybetaling is niet voltooid. Probeer het opnieuw.",
   },
 };

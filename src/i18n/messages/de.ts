@@ -123,6 +123,9 @@ export const de: Messages = {
     manage: "Abo verwalten", cancelSub: "Abo kündigen", cardRenews: "Ihr Kartenabo verlängert sich automatisch.",
     cardCanceled: "Ihr Kartenabo ist gekündigt und wird nicht verlängert.",
     waysToPay: "Zahlungsarten in {country}", approxNote: "Mit ≈ markierte Beträge sind ungefähre Werte zum heutigen Wechselkurs. Beim Bezahlen sehen Sie den genauen Preis inklusive Steuern.",
+    mobileTab: "Mobile Money", payMobile: "Mit Mobile Money bezahlen", mobileButton: "Weiter zur Zahlung von {amount}",
+    mobileHint: "Sie wählen Ihr Netz auf der sicheren Seite von Flutterwave und bestätigen die Zahlung auf Ihrem Telefon. Vorausbezahlt: keine automatische Verlängerung.",
+    mobileWaiting: "Warten auf die Bestätigung Ihrer Mobile-Money-Zahlung…",
   },
   settings: {
     thisBudget: "Dieses Budget", horizon: "Tage der Vorschau", horizonHint: "Die ursprüngliche Tabelle plant 31 Tage voraus.",
@@ -200,5 +203,7 @@ export const de: Messages = {
     currencyInvalid: "Wählen Sie eine gültige Währung.", localeInvalid: "Wählen Sie eine unterstützte Sprache.",
     cardUnavailable: "Kartenzahlung ist noch nicht verfügbar.",
     cardSubscriptionActive: "Sie haben bereits ein aktives Kartenabo. Verwalten Sie es in den Einstellungen.",
+    mobileMoneyUnavailable: "Mobile Money ist in Ihrem Land noch nicht verfügbar.",
+    mobileMoneyTimeout: "Die Mobile-Money-Zahlung wurde nicht abgeschlossen. Bitte versuchen Sie es erneut.",
   },
 };

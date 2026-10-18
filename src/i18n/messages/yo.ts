@@ -123,6 +123,9 @@ export const yo: Messages = {
     manage: "Ṣàkóso ìforúkọsílẹ̀", cancelSub: "Fagilé ìforúkọsílẹ̀", cardRenews: "Ìforúkọsílẹ̀ káàdì rẹ ń tún ara rẹ̀ ṣe.",
     cardCanceled: "A ti fagilé ìforúkọsílẹ̀ káàdì rẹ, kò sì ní tún ara rẹ̀ ṣe.",
     waysToPay: "Ọ̀nà ìsanwó ní {country}", approxNote: "Iye owó tí ó ní ≈ jẹ́ àfojúbù ní ìwọ̀n pàṣípààrọ̀ òní. Ojú-ìwé ìsanwó yóò fi iye gangan hàn, pẹ̀lú owó-orí.",
+    mobileTab: "Owó orí fóònù", payMobile: "Sanwó pẹ̀lú owó orí fóònù", mobileButton: "Tẹ̀síwájú láti san {amount}",
+    mobileHint: "Ìwọ yóò yan nẹ́tíwọ̀ọ̀kì rẹ lórí ojú-ìwé ààbò Flutterwave, kí o sì fọwọ́ sí ìsanwó lórí fóònù rẹ. Ìsanwó ṣáájú: kò ní tún ara rẹ̀ ṣe fúnra rẹ̀.",
+    mobileWaiting: "À ń dúró de ìfìdímúlẹ̀ ìsanwó owó orí fóònù rẹ…",
   },
   settings: {
     thisBudget: "Ètò ìnáwó yìí", horizon: "Ọjọ́ àsọtẹ́lẹ̀", horizonHint: "Ìwé ìṣirò àkọ́kọ́ ń wo ọjọ́ 31 síwájú.",
@@ -200,5 +203,7 @@ export const yo: Messages = {
     currencyInvalid: "Yan owó tó tọ̀nà.", localeInvalid: "Yan èdè tí a ṣe àtìlẹ́yìn fún.",
     cardUnavailable: "Ìsanwó pẹ̀lú káàdì kò tíì wà.",
     cardSubscriptionActive: "O ti ní ìforúkọsílẹ̀ káàdì tó ń ṣiṣẹ́. Ṣàkóso rẹ̀ láti inú Ètò.",
+    mobileMoneyUnavailable: "Owó orí fóònù kò tíì sí ní orílẹ̀-èdè rẹ.",
+    mobileMoneyTimeout: "Ìsanwó owó orí fóònù kò parí. Jọ̀wọ́ gbìyànjú lẹ́ẹ̀kan sí i.",
   },
 };

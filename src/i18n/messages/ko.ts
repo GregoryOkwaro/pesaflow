@@ -123,6 +123,9 @@ export const ko: Messages = {
     manage: "구독 관리", cancelSub: "구독 해지", cardRenews: "카드 구독은 자동으로 갱신됩니다.",
     cardCanceled: "카드 구독이 해지되어 갱신되지 않습니다.",
     waysToPay: "{country}의 결제 수단", approxNote: "≈ 표시 금액은 오늘 환율 기준 대략적인 값입니다. 결제 화면에 세금을 포함한 정확한 가격이 표시됩니다.",
+    mobileTab: "모바일 머니", payMobile: "모바일 머니로 결제", mobileButton: "{amount} 결제 계속하기",
+    mobileHint: "Flutterwave 보안 페이지에서 통신사를 선택하고 휴대폰에서 결제를 승인합니다. 선불: 자동으로 갱신되지 않습니다.",
+    mobileWaiting: "모바일 머니 결제 확인을 기다리는 중…",
   },
   settings: {
     thisBudget: "이 예산", horizon: "예측 일수", horizonHint: "원래 스프레드시트는 31일 앞까지 예측합니다.",
@@ -200,5 +203,7 @@ export const ko: Messages = {
     currencyInvalid: "올바른 통화를 선택하세요.", localeInvalid: "지원되는 언어를 선택하세요.",
     cardUnavailable: "카드 결제는 아직 이용할 수 없습니다.",
     cardSubscriptionActive: "이미 활성 카드 구독이 있습니다. 설정에서 관리하세요.",
+    mobileMoneyUnavailable: "회원님의 국가에서는 아직 모바일 머니를 사용할 수 없습니다.",
+    mobileMoneyTimeout: "모바일 머니 결제가 완료되지 않았습니다. 다시 시도해 주세요.",
   },
 };

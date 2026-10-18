@@ -123,6 +123,9 @@ export const tr: Messages = {
     manage: "Aboneliği yönet", cancelSub: "Aboneliği iptal et", cardRenews: "Kart aboneliğiniz otomatik olarak yenilenir.",
     cardCanceled: "Kart aboneliğiniz iptal edildi ve yenilenmeyecek.",
     waysToPay: "{country} için ödeme yöntemleri", approxNote: "≈ işaretli tutarlar bugünkü kura göre yaklaşıktır. Ödeme sayfası vergiler dahil kesin fiyatı gösterir.",
+    mobileTab: "Mobil para", payMobile: "Mobil parayla öde", mobileButton: "{amount} ödemeye devam et",
+    mobileHint: "Flutterwave'in güvenli sayfasında operatörünüzü seçip ödemeyi telefonunuzdan onaylayacaksınız. Ön ödemeli: otomatik yenilenmez.",
+    mobileWaiting: "Mobil para ödemenizin onaylanması bekleniyor…",
   },
   settings: {
     thisBudget: "Bu bütçe", horizon: "Tahmin günü", horizonHint: "Orijinal tablo 31 gün ilerisini öngörür.",
@@ -200,5 +203,7 @@ export const tr: Messages = {
     currencyInvalid: "Geçerli bir para birimi seçin.", localeInvalid: "Desteklenen bir dil seçin.",
     cardUnavailable: "Kartla ödeme henüz kullanılamıyor.",
     cardSubscriptionActive: "Zaten etkin bir kart aboneliğiniz var. Ayarlar'dan yönetin.",
+    mobileMoneyUnavailable: "Mobil para ülkenizde henüz kullanılamıyor.",
+    mobileMoneyTimeout: "Mobil para ödemesi tamamlanmadı. Lütfen tekrar deneyin.",
   },
 };

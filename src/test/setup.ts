@@ -8,6 +8,8 @@ Object.assign(process.env, {
   MPESA_CALLBACK_SECRET: "test-callback-secret-0123456789",
   PADDLE_ENV: "mock",
   PADDLE_WEBHOOK_SECRET: "pdl_ntfset_test_secret",
+  FLW_ENV: "mock",
+  FLW_WEBHOOK_HASH: "flw_test_secret_hash_0123456789",
   NOTIFY_ENV: "mock",
   JOBS_INLINE: "1",
   RATE_LIMIT_DISABLED: "1",

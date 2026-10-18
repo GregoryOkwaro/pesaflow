@@ -13,7 +13,7 @@ import { Daily, Items, Overview, SubscriptionBanner } from "./Views";
 type Dialog =
   | { kind: "item"; item?: Item }
   | { kind: "account"; account?: Account }
-  | { kind: "billing"; reason?: string }
+  | { kind: "billing"; reason?: string; resume?: { id: string; cancelled: boolean } }
   | { kind: "newBudget"; copy: boolean }
   | { kind: "confirm"; message: string; okLabel: string; onOk: () => void }
   | null;
@@ -44,6 +44,13 @@ export function BudgetApp(props: { me: Me; plans: Plan[]; payments: PaymentConfi
 
   useEffect(() => {
     if (search.get("reset") === "1") toast(t("settings.passwordChanged"));
+    // Back from the mobile money checkout (Flutterwave appends status/tx_ref/transaction_id;
+    // we only trust our own server's check, but a cancel means there's nothing to wait for).
+    const momo = search.get("momo");
+    if (momo) {
+      setDialog({ kind: "billing", resume: { id: momo, cancelled: search.get("status") === "cancelled" } });
+      window.history.replaceState(null, "", "/app");
+    }
     return onApiError((status, body) => {
       if (status === 401) router.replace("/login");
       if (status === 402) setDialog({ kind: "billing", reason: String(body.error ?? "") });
@@ -150,7 +157,7 @@ export function BudgetApp(props: { me: Me; plans: Plan[]; payments: PaymentConfi
           onDelete={(a) => setDialog({ kind: "confirm", okLabel: t("common.delete"), message: t("accountDialog.confirmDelete", { name: a.name }), onOk: () => mutate("DELETE", `/api/accounts/${a.id}`, undefined, t("accountDialog.deleted")) })} />
       )}
       {dialog?.kind === "billing" && (
-        <BillingDialog me={me} plans={props.plans} pricing={props.pricing} config={props.payments} reason={dialog.reason} onUser={setMe} onClose={() => setDialog(null)} />
+        <BillingDialog me={me} plans={props.plans} pricing={props.pricing} config={props.payments} reason={dialog.reason} resume={dialog.resume} onUser={setMe} onClose={() => setDialog(null)} />
       )}
       {dialog?.kind === "newBudget" && (
         <NewBudgetDialog

@@ -125,6 +125,9 @@ export const en = {
     manage: "Manage subscription", cancelSub: "Cancel subscription", cardRenews: "Your card subscription renews automatically.",
     cardCanceled: "Your card subscription is cancelled and won't renew.",
     waysToPay: "Ways to pay in {country}", approxNote: "Amounts marked ≈ are approximate, at today's exchange rate. Checkout shows the exact price, including any tax.",
+    mobileTab: "Mobile money", payMobile: "Pay with mobile money", mobileButton: "Continue to pay {amount}",
+    mobileHint: "You'll pick your network on Flutterwave's secure page and approve the payment on your phone. Prepaid: it doesn't renew automatically.",
+    mobileWaiting: "Waiting for your mobile money payment to be confirmed…",
   },
   settings: {
     thisBudget: "This budget", horizon: "Days to project", horizonHint: "The original spreadsheet looks 31 days ahead.",
@@ -202,6 +205,8 @@ export const en = {
     currencyInvalid: "Choose a valid currency.", localeInvalid: "Choose a supported language.",
     cardUnavailable: "Card payments aren't available yet.",
     cardSubscriptionActive: "You already have an active card subscription. Manage it from Settings.",
+    mobileMoneyUnavailable: "Mobile money isn't available in your country yet.",
+    mobileMoneyTimeout: "The mobile money payment wasn't completed. Please try again.",
   },
 };
 

@@ -14,7 +14,7 @@ export default async function Landing() {
   const config = paymentConfig();
   const kenya = pricing.country === "KE";
   const countryName = new Intl.DisplayNames([locale, "en"], { type: "region" }).of(pricing.country) ?? pricing.country;
-  const showApprox = !kenya && pricing.plans.some((p) => p.approxLocal !== null);
+  const showApprox = !kenya && !pricing.mobileMoney && pricing.plans.some((p) => p.approxLocal !== null);
   const features = [["f1Title", "f1Body"], ["f2Title", "f2Body"], ["f3Title", "f3Body"], ["f4Title", "f4Body"]] as const;
   const per = { monthly: "billing.perMonth", quarterly: "billing.perQuarter", yearly: "billing.perYear" } as const;
   return (
@@ -61,7 +61,7 @@ export default async function Landing() {
               <div key={p.key} className={`card ${p.key === "yearly" ? "ring-2 ring-[var(--brand)]" : ""}`}>
                 <div className="small muted font-bold uppercase">{t(`billing.${p.key}`)}{p.key === "yearly" ? ` · ${t("landing.bestValue")}` : ""}</div>
                 <div className="num mt-2 text-3xl font-extrabold">
-                  {kenya ? formatMoney(p.kes, "KES", locale) : (
+                  {kenya ? formatMoney(p.kes, "KES", locale) : pricing.mobileMoney ? formatMoney(pricing.mobileMoney.prices[p.key], pricing.mobileMoney.currency, locale) : (
                     <PaddlePrice priceId={p.paddlePriceId} country={pricing.country} token={config.paddleClientToken} env={config.paddleEnv}
                       fallback={<>
                         {formatMoney(p.usd, "USD", locale)}

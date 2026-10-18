@@ -5,8 +5,11 @@
  *
  * Paddle: cards everywhere; Apple Pay / Google Pay everywhere except India and Turkey;
  * PayPal where PayPal supports the currency; regional methods below (some must be
- * switched on in the Paddle dashboard: see README). No mobile money outside M-Pesa yet.
+ * switched on in the Paddle dashboard: see README). Mobile money networks come first
+ * where we collect them: M-Pesa in Kenya (Daraja), others via Flutterwave (mobileMoney.ts).
  */
+import { mobileMoneyFor } from "./mobileMoney";
+
 const REGIONAL: Record<string, string[]> = {
   IN: ["UPI"],
   BR: ["Pix"],
@@ -23,6 +26,7 @@ const NO_PAYPAL = new Set(["IN"]); // PayPal doesn't support INR checkout throug
 export function paymentMethodsFor(country: string, opts: { cardEnabled: boolean }): string[] {
   const methods: string[] = [];
   if (country === "KE") methods.push("M-Pesa");
+  methods.push(...(mobileMoneyFor(country)?.networks ?? []));
   if (!opts.cardEnabled) return methods;
   methods.push("Visa / Mastercard");
   methods.push(...(REGIONAL[country] ?? []));

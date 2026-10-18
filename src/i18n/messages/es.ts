@@ -123,6 +123,9 @@ export const es: Messages = {
     manage: "Gestionar suscripción", cancelSub: "Cancelar suscripción", cardRenews: "Tu suscripción con tarjeta se renueva automáticamente.",
     cardCanceled: "Tu suscripción con tarjeta está cancelada y no se renovará.",
     waysToPay: "Formas de pago en {country}", approxNote: "Los importes con ≈ son aproximados, al tipo de cambio de hoy. Al pagar verás el precio exacto, impuestos incluidos.",
+    mobileTab: "Dinero móvil", payMobile: "Pagar con dinero móvil", mobileButton: "Continuar para pagar {amount}",
+    mobileHint: "Elegirás tu operador en la página segura de Flutterwave y aprobarás el pago en tu teléfono. Prepago: no se renueva automáticamente.",
+    mobileWaiting: "Esperando la confirmación de tu pago con dinero móvil…",
   },
   settings: {
     thisBudget: "Este presupuesto", horizon: "Días a proyectar", horizonHint: "La hoja de cálculo original proyecta 31 días.",
@@ -200,5 +203,7 @@ export const es: Messages = {
     currencyInvalid: "Elige una moneda válida.", localeInvalid: "Elige un idioma disponible.",
     cardUnavailable: "El pago con tarjeta aún no está disponible.",
     cardSubscriptionActive: "Ya tienes una suscripción con tarjeta activa. Gestiónala en Ajustes.",
+    mobileMoneyUnavailable: "El dinero móvil aún no está disponible en tu país.",
+    mobileMoneyTimeout: "El pago con dinero móvil no se completó. Inténtalo de nuevo.",
   },
 };

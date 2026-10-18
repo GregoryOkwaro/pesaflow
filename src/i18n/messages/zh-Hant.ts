@@ -123,6 +123,9 @@ export const zhHant: Messages = {
     manage: "管理訂閱", cancelSub: "取消訂閱", cardRenews: "你的信用卡訂閱會自動續訂。",
     cardCanceled: "你的信用卡訂閱已取消，不會續訂。",
     waysToPay: "{country}的付款方式", approxNote: "帶 ≈ 的金額為依今日匯率估算。結帳時會顯示含稅的準確價格。",
+    mobileTab: "行動錢包", payMobile: "使用行動錢包付款", mobileButton: "繼續支付 {amount}",
+    mobileHint: "你將在 Flutterwave 的安全頁面選擇電信業者，並在手機上確認付款。預付制：不會自動續訂。",
+    mobileWaiting: "正在等待確認你的行動錢包付款…",
   },
   settings: {
     thisBudget: "目前預算", horizon: "預測天數", horizonHint: "原始試算表預測未來 31 天。",
@@ -200,5 +203,7 @@ export const zhHant: Messages = {
     currencyInvalid: "請選擇有效的貨幣。", localeInvalid: "請選擇支援的語言。",
     cardUnavailable: "信用卡付款暫不可用。",
     cardSubscriptionActive: "你已有有效的信用卡訂閱，請在設定中管理。",
+    mobileMoneyUnavailable: "你所在的國家尚不支援行動錢包。",
+    mobileMoneyTimeout: "行動錢包付款未完成，請再試一次。",
   },
 };

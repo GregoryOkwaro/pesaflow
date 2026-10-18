@@ -82,7 +82,7 @@ export function Settings({ data, me, budgetsCount, onBudgetSaved, onCopy, onNew,
               <li key={p.id}>
                 <div className="grow"><div className="title">{t(`billing.${p.plan as "monthly"}`)} · {formatMoney(p.amount, p.currency, locale)}</div>
                   <div className="meta">{new Date(p.createdAt).toLocaleString(locale === "en" ? "en-GB" : locale, { dateStyle: "medium", timeStyle: "short" })}
-                    {p.provider === "mpesa" ? ` · M-Pesa ${p.phone}` : " · Paddle"}{p.receipt ? ` · ${p.receipt}` : ""}
+                    {p.provider === "mpesa" ? ` · M-Pesa ${p.phone}` : p.provider === "flutterwave" ? ` · ${t("billing.mobileTab")}` : " · Paddle"}{p.receipt ? ` · ${p.receipt}` : ""}
                     {p.status === "failed" && p.resultDesc ? ` · ${tMaybe(p.resultDesc)}` : ""}</div></div>
                 <span className={`chip ${p.status === "success" ? "" : "tie"}`}>{t(`status.${p.status}`)}</span>
               </li>

@@ -123,6 +123,9 @@ export const ar: Messages = {
     manage: "إدارة الاشتراك", cancelSub: "إلغاء الاشتراك", cardRenews: "يتجدّد اشتراكك بالبطاقة تلقائيًا.",
     cardCanceled: "أُلغي اشتراكك بالبطاقة ولن يتجدّد.",
     waysToPay: "طرق الدفع في {country}", approxNote: "المبالغ المميزة بـ ≈ تقريبية حسب سعر الصرف اليوم. تعرض صفحة الدفع السعر الدقيق شاملًا أي ضريبة.",
+    mobileTab: "الأموال عبر الهاتف", payMobile: "ادفع عبر الهاتف المحمول", mobileButton: "تابع لدفع {amount}",
+    mobileHint: "ستختار شبكتك في صفحة Flutterwave الآمنة وتوافق على الدفع من هاتفك. دفع مسبق: لا يتجدد تلقائيًا.",
+    mobileWaiting: "في انتظار تأكيد دفعتك عبر الهاتف المحمول…",
   },
   settings: {
     thisBudget: "هذه الميزانية", horizon: "أيام التوقّع", horizonHint: "جدول البيانات الأصلي يتوقّع 31 يومًا.",
@@ -200,5 +203,7 @@ export const ar: Messages = {
     currencyInvalid: "اختر عملة صالحة.", localeInvalid: "اختر لغة مدعومة.",
     cardUnavailable: "الدفع بالبطاقة غير متاح بعد.",
     cardSubscriptionActive: "لديك بالفعل اشتراك نشط بالبطاقة. أدِره من الإعدادات.",
+    mobileMoneyUnavailable: "الدفع عبر الهاتف المحمول غير متاح في بلدك بعد.",
+    mobileMoneyTimeout: "لم تكتمل عملية الدفع عبر الهاتف المحمول. يُرجى المحاولة مرة أخرى.",
   },
 };

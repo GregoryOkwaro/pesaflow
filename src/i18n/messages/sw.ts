@@ -123,6 +123,9 @@ export const sw: Messages = {
     manage: "Simamia usajili", cancelSub: "Sitisha usajili", cardRenews: "Usajili wako wa kadi hujirudia kiotomatiki.",
     cardCanceled: "Usajili wako wa kadi umesitishwa na hautajirudia.",
     waysToPay: "Njia za kulipa nchini {country}", approxNote: "Viwango vyenye ≈ ni vya makadirio kwa kiwango cha ubadilishaji cha leo. Wakati wa kulipa utaona bei kamili, pamoja na kodi.",
+    mobileTab: "Pesa kwa simu", payMobile: "Lipa kwa pesa ya simu", mobileButton: "Endelea kulipa {amount}",
+    mobileHint: "Utachagua mtandao wako kwenye ukurasa salama wa Flutterwave na kuidhinisha malipo kwenye simu yako. Malipo ya awali: hayajirudii yenyewe.",
+    mobileWaiting: "Tunasubiri malipo yako ya pesa kwa simu yathibitishwe…",
   },
   settings: {
     thisBudget: "Bajeti hii", horizon: "Siku za kukadiria", horizonHint: "Lahajedwali la awali linaangalia siku 31 mbele.",
@@ -200,5 +203,7 @@ export const sw: Messages = {
     currencyInvalid: "Chagua sarafu sahihi.", localeInvalid: "Chagua lugha inayotumika.",
     cardUnavailable: "Malipo kwa kadi bado hayapatikani.",
     cardSubscriptionActive: "Tayari una usajili wa kadi unaoendelea. Usimamie kwenye Mipangilio.",
+    mobileMoneyUnavailable: "Pesa kwa simu bado haipatikani nchini mwako.",
+    mobileMoneyTimeout: "Malipo ya pesa kwa simu hayakukamilika. Tafadhali jaribu tena.",
   },
 };

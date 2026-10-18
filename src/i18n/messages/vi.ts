@@ -123,6 +123,9 @@ export const vi: Messages = {
     manage: "Quản lý gói đăng ký", cancelSub: "Hủy gói đăng ký", cardRenews: "Gói đăng ký bằng thẻ của bạn tự động gia hạn.",
     cardCanceled: "Gói đăng ký bằng thẻ đã bị hủy và sẽ không gia hạn.",
     waysToPay: "Cách thanh toán tại {country}", approxNote: "Số tiền có dấu ≈ là ước tính theo tỷ giá hôm nay. Trang thanh toán hiển thị giá chính xác, đã gồm thuế.",
+    mobileTab: "Ví di động", payMobile: "Thanh toán bằng ví di động", mobileButton: "Tiếp tục thanh toán {amount}",
+    mobileHint: "Bạn sẽ chọn nhà mạng trên trang bảo mật của Flutterwave và xác nhận thanh toán trên điện thoại. Trả trước: không tự động gia hạn.",
+    mobileWaiting: "Đang chờ xác nhận thanh toán bằng ví di động…",
   },
   settings: {
     thisBudget: "Ngân sách này", horizon: "Số ngày dự báo", horizonHint: "Bảng tính gốc dự báo 31 ngày tới.",
@@ -200,5 +203,7 @@ export const vi: Messages = {
     currencyInvalid: "Chọn tiền tệ hợp lệ.", localeInvalid: "Chọn ngôn ngữ được hỗ trợ.",
     cardUnavailable: "Thanh toán bằng thẻ hiện chưa khả dụng.",
     cardSubscriptionActive: "Bạn đã có gói đăng ký bằng thẻ đang hoạt động. Hãy quản lý trong Cài đặt.",
+    mobileMoneyUnavailable: "Ví di động chưa khả dụng tại quốc gia của bạn.",
+    mobileMoneyTimeout: "Thanh toán bằng ví di động chưa hoàn tất. Vui lòng thử lại.",
   },
 };

@@ -57,6 +57,14 @@ const schema = z.object({
   MPESA_PARTY_B: optStr(),
   MPESA_CALLBACK_SECRET: str(""),
 
+  // MTN MoMo, Airtel Money and other African mobile money via Flutterwave (prepaid, local currency).
+  // Flutterwave is not a merchant of record: you are the seller and handle local tax.
+  FLW_ENV: oneOf(["mock", "test", "live"], "mock"), // test = Flutterwave test-mode keys
+  FLW_SECRET_KEY: optStr(), // FLWSECK-... (server only)
+  FLW_WEBHOOK_HASH: optStr(), // "Secret hash" set on the webhook in the Flutterwave dashboard
+  FLW_PRICES: optStr(), // optional JSON overrides, major units: {"UGX":[11000,29000,105000]}
+  FLW_COUNTRIES: optStr(), // optional allow-list, e.g. "UG,RW,TZ" (default: all in mobileMoney.ts)
+
   // Messages: mock (logged) | live
   NOTIFY_ENV: oneOf(["mock", "live"], "mock"),
   ZEPTOMAIL_TOKEN: optStr(), // "Zoho-enczapikey ..." send-mail token
@@ -95,6 +103,9 @@ export function env(): Env {
     }
     if (e.PADDLE_ENV !== "mock" && (!e.PADDLE_WEBHOOK_SECRET || !e.PADDLE_CLIENT_TOKEN)) {
       throw new Error("PADDLE_CLIENT_TOKEN and PADDLE_WEBHOOK_SECRET are required when PADDLE_ENV is sandbox/production.");
+    }
+    if (e.FLW_ENV !== "mock" && (!e.FLW_SECRET_KEY || !e.FLW_WEBHOOK_HASH || e.FLW_WEBHOOK_HASH.length < 20)) {
+      throw new Error("FLW_SECRET_KEY and a long random FLW_WEBHOOK_HASH are required when FLW_ENV is test/live.");
     }
     cached = e;
   }
@@ -137,6 +148,7 @@ export function paymentConfig() {
     mpesaEnv: e.MPESA_ENV,
     paddleEnv: e.PADDLE_ENV,
     paddleClientToken: e.PADDLE_CLIENT_TOKEN ?? null,
+    mobileMoneyEnv: e.FLW_ENV,
     cardEnabled: e.PADDLE_ENV === "mock" || PLAN_KEYS.every((k) => !!paddlePriceId(k)),
   };
 }

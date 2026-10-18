@@ -123,6 +123,9 @@ export const pl: Messages = {
     manage: "Zarządzaj subskrypcją", cancelSub: "Anuluj subskrypcję", cardRenews: "Subskrypcja kartą odnawia się automatycznie.",
     cardCanceled: "Subskrypcja kartą została anulowana i nie zostanie odnowiona.",
     waysToPay: "Metody płatności: {country}", approxNote: "Kwoty oznaczone ≈ są przybliżone, według dzisiejszego kursu. Przy płatności zobaczysz dokładną cenę z podatkiem.",
+    mobileTab: "Płatności mobilne", payMobile: "Zapłać przez portfel mobilny", mobileButton: "Przejdź do zapłaty {amount}",
+    mobileHint: "Wybierzesz sieć na bezpiecznej stronie Flutterwave i zatwierdzisz płatność w telefonie. Przedpłata: bez automatycznego odnawiania.",
+    mobileWaiting: "Czekamy na potwierdzenie płatności mobilnej…",
   },
   settings: {
     thisBudget: "Ten budżet", horizon: "Dni prognozy", horizonHint: "Oryginalny arkusz prognozuje 31 dni do przodu.",
@@ -200,5 +203,7 @@ export const pl: Messages = {
     currencyInvalid: "Wybierz prawidłową walutę.", localeInvalid: "Wybierz obsługiwany język.",
     cardUnavailable: "Płatności kartą nie są jeszcze dostępne.",
     cardSubscriptionActive: "Masz już aktywną subskrypcję kartą. Zarządzaj nią w ustawieniach.",
+    mobileMoneyUnavailable: "Płatności mobilne nie są jeszcze dostępne w Twoim kraju.",
+    mobileMoneyTimeout: "Płatność mobilna nie została zakończona. Spróbuj ponownie.",
   },
 };

@@ -123,6 +123,9 @@ export const ha: Messages = {
     manage: "Sarrafa rajista", cancelSub: "Soke rajista", cardRenews: "Rajistar katinka tana sabuntawa kai tsaye.",
     cardCanceled: "An soke rajistar katinka kuma ba za ta sabunta ba.",
     waysToPay: "Hanyoyin biya a {country}", approxNote: "Adadin da ke da ≈ ƙiyasi ne bisa farashin canji na yau. Lokacin biya za a nuna ainihin farashi, har da haraji.",
+    mobileTab: "Kuɗin waya", payMobile: "Biya da kuɗin waya", mobileButton: "Ci gaba don biyan {amount}",
+    mobileHint: "Za ka zaɓi kamfanin sadarwarka a shafin Flutterwave mai tsaro sannan ka amince da biyan a wayarka. Biya kafin amfani: ba ya sabunta kansa.",
+    mobileWaiting: "Ana jiran tabbatar da biyan kuɗin wayarka…",
   },
   settings: {
     thisBudget: "Wannan kasafi", horizon: "Kwanakin hasashe", horizonHint: "Takardar asali tana hasashen kwanaki 31 a gaba.",
@@ -200,5 +203,7 @@ export const ha: Messages = {
     currencyInvalid: "Zaɓi kuɗi mai inganci.", localeInvalid: "Zaɓi harshen da ake goyon baya.",
     cardUnavailable: "Biyan kuɗi da kati bai samu ba tukuna.",
     cardSubscriptionActive: "Kana da rajistar kati mai aiki tuni. Sarrafa ta daga Saituna.",
+    mobileMoneyUnavailable: "Kuɗin waya ba su samu a ƙasarka ba tukuna.",
+    mobileMoneyTimeout: "Ba a kammala biyan kuɗin waya ba. Da fatan za a sake gwadawa.",
   },
 };

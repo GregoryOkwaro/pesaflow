@@ -123,6 +123,9 @@ export const ja: Messages = {
     manage: "サブスクリプションを管理", cancelSub: "サブスクリプションを解約", cardRenews: "カードのサブスクリプションは自動更新されます。",
     cardCanceled: "カードのサブスクリプションは解約済みで、更新されません。",
     waysToPay: "{country}での支払い方法", approxNote: "≈ の付いた金額は本日の為替レートによる概算です。お支払い画面には税込みの正確な価格が表示されます。",
+    mobileTab: "モバイルマネー", payMobile: "モバイルマネーで支払う", mobileButton: "{amount} の支払いに進む",
+    mobileHint: "Flutterwave の安全なページで通信会社を選び、スマートフォンで支払いを承認します。前払い制：自動更新はされません。",
+    mobileWaiting: "モバイルマネーでの支払いの確認を待っています…",
   },
   settings: {
     thisBudget: "この予算", horizon: "予測日数", horizonHint: "元のスプレッドシートは31日先まで予測します。",
@@ -200,5 +203,7 @@ export const ja: Messages = {
     currencyInvalid: "有効な通貨を選んでください。", localeInvalid: "対応している言語を選んでください。",
     cardUnavailable: "カード決済はまだご利用いただけません。",
     cardSubscriptionActive: "有効なカードのサブスクリプションが既にあります。設定から管理してください。",
+    mobileMoneyUnavailable: "お住まいの国ではまだモバイルマネーをご利用いただけません。",
+    mobileMoneyTimeout: "モバイルマネーでの支払いが完了しませんでした。もう一度お試しください。",
   },
 };

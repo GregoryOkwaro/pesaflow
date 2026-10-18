@@ -195,13 +195,17 @@ export function NewBudgetDialog({ copyFrom, suggested, defaultCurrency, onCreate
 
 // ---------------------------------------------------------------- billing (M-Pesa + Paddle)
 
-export function BillingDialog({ me, plans, pricing, config, reason, onUser, onClose }: {
-  me: Me; plans: Plan[]; pricing: Pricing; config: PaymentConfig; reason?: string; onUser: (u: Me) => void; onClose: () => void;
+export function BillingDialog({ me, plans, pricing, config, reason, resume, onUser, onClose }: {
+  me: Me; plans: Plan[]; pricing: Pricing; config: PaymentConfig; reason?: string;
+  resume?: { id: string; cancelled: boolean }; // back from the mobile money checkout
+  onUser: (u: Me) => void; onClose: () => void;
 }) {
   const { t, tMaybe, locale } = useT();
   const f = useFmt("KES");
   const kenya = me.country === "KE";
-  const [method, setMethod] = useState<"mpesa" | "card">(kenya ? "mpesa" : "card");
+  const momo = pricing.mobileMoney;
+  const methods = ([kenya && "mpesa", momo && "momo", config.cardEnabled && "card"] as const).filter((m): m is "mpesa" | "momo" | "card" => !!m);
+  const [method, setMethod] = useState<"mpesa" | "momo" | "card">(methods[0] ?? "card");
   const [plan, setPlan] = useState<Plan["key"]>("yearly");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -214,6 +218,17 @@ export function BillingDialog({ me, plans, pricing, config, reason, onUser, onCl
   const cardActive = !!me.card && ["active", "trialing", "past_due"].includes(me.card.status ?? "");
 
   useEffect(() => () => { clearInterval(timer.current); setPaddleEventHandler(null); }, []);
+
+  // Returning from the mobile money checkout: show where that payment stands.
+  useEffect(() => {
+    if (!resume) return;
+    setMethod("momo");
+    api<{ payment: Payment; user: Me }>("GET", `/api/billing/payments/${resume.id}`).then((res) => {
+      if (res.payment.status === "pending" && !resume.cancelled) return setWaiting(res.payment);
+      onUser(res.user);
+      setResult({ ok: res.payment.status === "success", desc: res.payment.status === "failed" ? res.payment.resultDesc : undefined, receipt: res.payment.receipt, user: res.user });
+    }).catch((err) => setError((err as Error).message));
+  }, [resume, onUser]);
 
   // M-Pesa: poll our payment until the callback (or status query) settles it.
   useEffect(() => {
@@ -268,6 +283,18 @@ export function BillingDialog({ me, plans, pricing, config, reason, onUser, onCl
     }
   }
 
+  async function payMobile() {
+    setBusy(true);
+    setError("");
+    try {
+      const { redirectUrl } = await api<{ payment: Payment; redirectUrl: string }>("POST", "/api/billing/mobile", { plan });
+      window.location.assign(redirectUrl); // Flutterwave's page (mock mode: straight back here)
+    } catch (err) {
+      setError((err as Error).message);
+      setBusy(false);
+    }
+  }
+
   async function payCard() {
     setBusy(true);
     setError("");
@@ -298,6 +325,7 @@ export function BillingDialog({ me, plans, pricing, config, reason, onUser, onCl
   const approx = (key: Plan["key"]) => pricing.plans.find((x) => x.key === key)?.approxLocal ?? null;
   const priceLabel = (p: Plan) => {
     if (method === "mpesa") return f.money(p.kes);
+    if (method === "momo" && momo) return formatMoney(momo.prices[p.key], momo.currency, locale);
     const a = approx(p.key);
     return (
       <PaddlePrice priceId={p.paddlePriceId} country={pricing.country} token={config.paddleClientToken} env={config.paddleEnv}
@@ -330,8 +358,10 @@ export function BillingDialog({ me, plans, pricing, config, reason, onUser, onCl
     content = (
       <div className="mpesa-wait">
         <div className="spinner" />
-        <p><b>{waiting ? t("billing.checkPhone") : t("billing.cardDone")}</b></p>
-        {waiting && <p className="small muted">{t("billing.sentTo", { phone: waiting.phone, amount: formatMoney(waiting.amount, waiting.currency, locale) })}</p>}
+        <p><b>{!waiting ? t("billing.cardDone") : waiting.provider === "flutterwave" ? t("billing.mobileWaiting") : t("billing.checkPhone")}</b></p>
+        {waiting && <p className="small muted">{waiting.provider === "flutterwave"
+          ? formatMoney(waiting.amount, waiting.currency, locale)
+          : t("billing.sentTo", { phone: waiting.phone, amount: formatMoney(waiting.amount, waiting.currency, locale) })}</p>}
         <p className="small muted">{slow ? t("billing.slow") : t("billing.waiting")}</p>
       </div>
     );
@@ -340,10 +370,13 @@ export function BillingDialog({ me, plans, pricing, config, reason, onUser, onCl
       <>
         {reason && <div className="alert warn">{reason}</div>}
         <p className="small muted">{s.active ? t("billing.activeUntil", { date: f.longDate(s.accessUntil) }) : t("billing.choose")}</p>
-        {kenya && config.cardEnabled && (
+        {methods.length > 1 && (
           <div className="tabs" role="tablist">
-            <button type="button" className={method === "mpesa" ? "on" : ""} onClick={() => setMethod("mpesa")}>M-Pesa</button>
-            <button type="button" className={method === "card" ? "on" : ""} onClick={() => setMethod("card")}>{t("billing.payCard")}</button>
+            {methods.map((m) => (
+              <button key={m} type="button" role="tab" aria-selected={method === m} className={method === m ? "on" : ""} onClick={() => setMethod(m)}>
+                {m === "mpesa" ? "M-Pesa" : m === "momo" ? t("billing.mobileTab") : t("billing.payCard")}
+              </button>
+            ))}
           </div>
         )}
         <FormError message={error} />
@@ -362,6 +395,14 @@ export function BillingDialog({ me, plans, pricing, config, reason, onUser, onCl
             <button className="btn primary full" type="submit" disabled={busy}>{t("billing.sendPrompt")}</button>
             <p className="hint">{t("billing.mpesaHint")}{config.mpesaEnv === "mock" && <b> {t("billing.testMode")}</b>}{config.mpesaEnv === "sandbox" && <b> {t("billing.sandboxMode")}</b>}</p>
           </form>
+        ) : method === "momo" && momo ? (
+          <>
+            <div className="methods">{momo.networks.map((n) => <span key={n} className="chip">{n}</span>)}</div>
+            <button className="btn primary full" onClick={payMobile} disabled={busy}>
+              {t("billing.mobileButton", { amount: formatMoney(momo.prices[plan], momo.currency, locale) })}
+            </button>
+            <p className="hint">{t("billing.mobileHint")}{config.mobileMoneyEnv === "mock" && <b> {t("billing.testMode")}</b>}{config.mobileMoneyEnv === "test" && <b> {t("billing.sandboxMode")}</b>}</p>
+          </>
         ) : (
           <>
             {cardActive ? <div className="alert ok">{t("billing.cardRenews")}</div> : (
@@ -370,7 +411,7 @@ export function BillingDialog({ me, plans, pricing, config, reason, onUser, onCl
             {pricing.methods.length > 0 && (
               <>
                 <div className="small muted font-bold">{t("billing.waysToPay", { country: countryName })}</div>
-                <div className="methods">{pricing.methods.filter((m) => m !== "M-Pesa").map((m) => <span key={m} className="chip">{m}</span>)}</div>
+                <div className="methods">{pricing.methods.filter((m) => m !== "M-Pesa" && !momo?.networks.includes(m)).map((m) => <span key={m} className="chip">{m}</span>)}</div>
               </>
             )}
             <p className="hint">{t("billing.cardHint")}{config.paddleEnv === "mock" && <b> {t("billing.testMode")}</b>}{config.paddleEnv === "sandbox" && <b> {t("billing.sandboxMode")}</b>}</p>
@@ -380,5 +421,7 @@ export function BillingDialog({ me, plans, pricing, config, reason, onUser, onCl
       </>
     );
   }
-  return <Modal title={method === "mpesa" && !result && !waiting ? t("billing.payMpesa") : t("billing.title")} onClose={onClose}>{content}</Modal>;
+  const idle = !result && !waiting;
+  const title = idle && method === "mpesa" ? t("billing.payMpesa") : idle && method === "momo" ? t("billing.payMobile") : t("billing.title");
+  return <Modal title={title} onClose={onClose}>{content}</Modal>;
 }

@@ -123,6 +123,9 @@ export const am: Messages = {
     manage: "የደንበኝነት ምዝገባን አስተዳድር", cancelSub: "የደንበኝነት ምዝገባን ሰርዝ", cardRenews: "የካርድ ምዝገባዎ በራስ-ሰር ይታደሳል።",
     cardCanceled: "የካርድ ምዝገባዎ ተሰርዟል እና አይታደስም።",
     waysToPay: "በ{country} የመክፈያ መንገዶች", approxNote: "≈ ምልክት ያላቸው መጠኖች በዛሬው የምንዛሬ ተመን ግምታዊ ናቸው። በክፍያ ጊዜ ትክክለኛው ዋጋ ከግብር ጋር ይታያል።",
+    mobileTab: "የሞባይል ገንዘብ", payMobile: "በሞባይል ገንዘብ ይክፈሉ", mobileButton: "{amount} ለመክፈል ይቀጥሉ",
+    mobileHint: "በFlutterwave ደህንነቱ የተጠበቀ ገጽ ላይ ኔትወርክዎን መርጠው ክፍያውን በስልክዎ ያጸድቃሉ። ቅድመ ክፍያ፦ በራሱ አይታደስም።",
+    mobileWaiting: "የሞባይል ገንዘብ ክፍያዎ እስኪረጋገጥ በመጠበቅ ላይ…",
   },
   settings: {
     thisBudget: "ይህ በጀት", horizon: "የትንበያ ቀናት", horizonHint: "የመጀመሪያው የተመን ሉህ 31 ቀናት ወደፊት ይመለከታል።",
@@ -200,5 +203,7 @@ export const am: Messages = {
     currencyInvalid: "ትክክለኛ ምንዛሬ ይምረጡ።", localeInvalid: "የሚደገፍ ቋንቋ ይምረጡ።",
     cardUnavailable: "የካርድ ክፍያ ገና አይገኝም።",
     cardSubscriptionActive: "ንቁ የካርድ ምዝገባ አስቀድሞ አለዎት። ከቅንብሮች ያስተዳድሩት።",
+    mobileMoneyUnavailable: "የሞባይል ገንዘብ በአገርዎ ገና አይገኝም።",
+    mobileMoneyTimeout: "የሞባይል ገንዘብ ክፍያው አልተጠናቀቀም። እባክዎ እንደገና ይሞክሩ።",
   },
 };

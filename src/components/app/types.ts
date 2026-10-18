@@ -23,11 +23,13 @@ export interface Me {
 }
 /** Prices in minor units: `kes` for M-Pesa, `usd` for display elsewhere (Paddle shows the real local price). */
 export interface Plan { key: "monthly" | "quarterly" | "yearly"; days: number; kes: number; usd: number; paddlePriceId: string | null }
-export interface PaymentConfig { mpesaEnv: string; paddleEnv: string; paddleClientToken: string | null; cardEnabled: boolean }
+export interface PaymentConfig { mpesaEnv: string; paddleEnv: string; paddleClientToken: string | null; mobileMoneyEnv: string; cardEnabled: boolean }
 /** Prices and payment options for the user's country (see src/server/pricing.ts). */
 export interface Pricing {
   country: string; localCurrency: string; chargedInLocal: boolean; methods: string[];
   plans: (Plan & { approxLocal: number | null })[];
+  /** Prepaid MTN MoMo / Airtel Money etc. via Flutterwave; prices in minor units of `currency`. */
+  mobileMoney: { currency: string; networks: string[]; prices: Record<Plan["key"], number> } | null;
 }
 export interface Payment {
   id: string; provider: string; plan: string; amount: number; currency: string; phone: string;

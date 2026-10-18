@@ -123,6 +123,9 @@ export const id: Messages = {
     manage: "Kelola langganan", cancelSub: "Batalkan langganan", cardRenews: "Langganan kartu Anda diperpanjang otomatis.",
     cardCanceled: "Langganan kartu Anda dibatalkan dan tidak akan diperpanjang.",
     waysToPay: "Cara bayar di {country}", approxNote: "Jumlah bertanda ≈ adalah perkiraan menurut kurs hari ini. Halaman pembayaran menampilkan harga pasti, termasuk pajak.",
+    mobileTab: "Uang elektronik seluler", payMobile: "Bayar dengan uang seluler", mobileButton: "Lanjutkan untuk membayar {amount}",
+    mobileHint: "Anda akan memilih operator di halaman aman Flutterwave dan menyetujui pembayaran di ponsel. Prabayar: tidak diperpanjang otomatis.",
+    mobileWaiting: "Menunggu konfirmasi pembayaran uang seluler Anda…",
   },
   settings: {
     thisBudget: "Anggaran ini", horizon: "Hari proyeksi", horizonHint: "Spreadsheet asli memproyeksikan 31 hari ke depan.",
@@ -200,5 +203,7 @@ export const id: Messages = {
     currencyInvalid: "Pilih mata uang yang valid.", localeInvalid: "Pilih bahasa yang didukung.",
     cardUnavailable: "Pembayaran kartu belum tersedia.",
     cardSubscriptionActive: "Anda sudah memiliki langganan kartu yang aktif. Kelola dari Pengaturan.",
+    mobileMoneyUnavailable: "Uang seluler belum tersedia di negara Anda.",
+    mobileMoneyTimeout: "Pembayaran uang seluler tidak selesai. Silakan coba lagi.",
   },
 };

@@ -123,6 +123,9 @@ export const zhHans: Messages = {
     manage: "管理订阅", cancelSub: "取消订阅", cardRenews: "你的银行卡订阅会自动续订。",
     cardCanceled: "你的银行卡订阅已取消，不会续订。",
     waysToPay: "{country}的支付方式", approxNote: "带 ≈ 的金额为按今日汇率估算。结账时会显示含税的准确价格。",
+    mobileTab: "移动钱包", payMobile: "使用移动钱包付款", mobileButton: "继续支付 {amount}",
+    mobileHint: "你将在 Flutterwave 的安全页面选择运营商，并在手机上确认付款。预付费：不会自动续订。",
+    mobileWaiting: "正在等待确认你的移动钱包付款…",
   },
   settings: {
     thisBudget: "当前预算", horizon: "预测天数", horizonHint: "原始电子表格预测未来 31 天。",
@@ -200,5 +203,7 @@ export const zhHans: Messages = {
     currencyInvalid: "请选择有效的货币。", localeInvalid: "请选择支持的语言。",
     cardUnavailable: "银行卡支付暂不可用。",
     cardSubscriptionActive: "你已有有效的银行卡订阅，请在设置中管理。",
+    mobileMoneyUnavailable: "你所在的国家暂不支持移动钱包。",
+    mobileMoneyTimeout: "移动钱包付款未完成，请重试。",
   },
 };

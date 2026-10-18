@@ -1,9 +1,11 @@
 /**
  * What a visitor from a given country sees when choosing a plan:
  *  - Kenya: exact KES prices for M-Pesa; card prices in USD with ≈ KES.
+ *  - Mobile money countries (Uganda, Ghana, ...): exact local prices for MTN MoMo, Airtel etc.
  *  - Elsewhere: USD list price plus ≈ local currency (today's rate). With Paddle live, the
  *    browser replaces these with Paddle's exact local price incl. tax (PricePreview).
  */
+import { mobileMoneyFor } from "./payments/mobileMoney";
 import { currencyForCountry, isCountry } from "@/lib/countries";
 import { paymentConfig, planList } from "./env";
 import { PADDLE_CURRENCIES, paymentMethodsFor } from "./payments/methods";
@@ -20,6 +22,11 @@ export async function pricingFor(rawCountry: string | null | undefined) {
     // Paddle can charge this currency directly (with country price overrides set in Paddle).
     chargedInLocal: PADDLE_CURRENCIES.has(localCurrency),
     methods: paymentMethodsFor(country, { cardEnabled: config.cardEnabled }),
+    // Prepaid mobile money in local currency (minor units per plan), or null.
+    mobileMoney: (() => {
+      const m = mobileMoneyFor(country);
+      return m && { currency: m.currency, networks: m.networks, prices: m.prices };
+    })(),
     plans: planList().map((p) => ({
       ...p,
       approxLocal: localCurrency === "USD" ? null : approxFromUsd(p.usd, localCurrency, rates),

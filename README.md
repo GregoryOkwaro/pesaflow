@@ -1,10 +1,11 @@
 # PesaFlow: day-by-day cash flow budget (global SaaS, Kenya first)
 
 A day-by-day cash flow budget built from the GFSN monthly cash flow workbook, sold on subscription:
-M-Pesa in Kenya, and cards, PayPal and local payment methods everywhere else.
+M-Pesa in Kenya, MTN MoMo, Airtel Money and other mobile money across Africa, and cards, PayPal and
+local payment methods everywhere else.
 
 **Stack:** Next.js 16 (App Router, TypeScript) · PostgreSQL 18 · Drizzle ORM · pg-boss (Postgres job
-queue) · Safaricom Daraja (M-Pesa STK push) · Paddle (merchant of record, worldwide) · ZeptoMail
+queue) · Safaricom Daraja (M-Pesa STK push) · Flutterwave (mobile money) · Paddle (merchant of record, worldwide) · ZeptoMail
 (email) · Africa's Talking (SMS) · Cloudflare (DNS, CDN, firewall, Turnstile).
 
 **Global:** 26 languages, including right-to-left Arabic and Urdu · any currency, with the correct
@@ -19,7 +20,7 @@ Next.js web (Node, container)  ←→  PostgreSQL 18 (managed, same region)
         └── queues jobs ──►  worker (pg-boss): messages, payment reconciliation,
                                      renewal reminders, housekeeping
                                      │
-              Daraja (M-Pesa) · Paddle (cards/PayPal) · ZeptoMail (email) · Africa's Talking (SMS)
+   Daraja (M-Pesa) · Flutterwave (MoMo/Airtel) · Paddle (cards/PayPal) · ZeptoMail (email) · Africa's Talking (SMS)
 ```
 
 ## Run it locally
@@ -38,11 +39,12 @@ With `JOBS_INLINE=1` (the local default), emails and SMS are handled inside the 
 worker is needed. To run jobs the production way, set `JOBS_INLINE=0` and run `npm run worker` too.
 
 Local test accounts (exist only in your local database): `demo@pesaflow.test` / `LocalDevReset-2026`
-(Kenya, KES) and `lena@pesaflow.test` / `LocalDevOnly-2026` (Germany, EUR).
+(Kenya, KES), `lena@pesaflow.test` / `LocalDevOnly-2026` (Germany, EUR) and
+`okello@pesaflow.test` / `LocalDevOnly-2026` (Uganda, UGX: try mobile money).
 In mock mode, reset codes and receipts appear in the `npm run dev` console.
 
 ```bash
-npm test            # 126 tests: spreadsheet parity, API, billing, Paddle, 26 languages, currencies, time zones, GDPR
+npm test            # 141 tests: spreadsheet parity, API, billing, Paddle, mobile money, 26 languages, currencies, time zones, GDPR
 npm run typecheck
 npm run build
 ```
@@ -55,8 +57,8 @@ src/i18n/              core.ts (browser-safe engine) · translate.ts (server, al
 src/lib/               dates (time zones), money (minor units, any currency), countries, API client
 src/server/db/         Drizzle schema (uuidv7 ids, bigint minor units), connection, migrator
 src/server/auth/       argon2id passwords, sessions (HttpOnly cookie, hashed tokens)
-src/server/services/   budgets, users (reset, GDPR export/delete), billing (M-Pesa + Paddle), reminders
-src/server/payments/   PaymentProvider interface · Daraja · Paddle · mocks · phone numbers
+src/server/services/   budgets, users (reset, GDPR export/delete), billing (M-Pesa, mobile money, Paddle), reminders
+src/server/payments/   PaymentProvider interface · Daraja · Flutterwave · Paddle · mocks · phone numbers
 src/server/notify/     ZeptoMail + Africa's Talking delivery
 src/server/jobs/       pg-boss queue + worker (reminders at 9am in each user's time zone)
 src/app/api/           route handlers (thin: validate → service → JSON)
@@ -95,6 +97,7 @@ days match.
 | **Language choice** | The language set on the person's phone or browser wins (e.g. most Kenyans and Indians browse in English). The country is used only if that language isn't supported, and to offer the local one in a one-tap banner written in that language ("PesaFlow हिन्दी में भी उपलब्ध है"). It never switches language on its own. |
 | **Budget currency** | Always the user's local currency (INR in India, KES in Kenya). People budget in the money they earn and spend, never in USD. Changeable per budget. |
 | **Prices** | Kenya: exact KES for M-Pesa. Elsewhere: the USD list price with **≈ local** underneath at today's rate (daily from open.er-api.com, display only). When Paddle is live, the browser swaps in Paddle's **exact** local price including tax (`PricePreview`), so the ≈ figure is only a fallback. |
+| **Mobile money** | Uganda, Rwanda, Zambia (MTN MoMo, Airtel Money), Tanzania (Airtel Money, Vodacom M-Pesa, Mixx by Yas, HaloPesa), Ghana (MTN MoMo, Telecel Cash, AirtelTigo Money), Cameroon, Côte d'Ivoire, Senegal (MTN MoMo, Orange Money, Moov) through Flutterwave's hosted checkout. Prepaid plans at round local prices (`src/server/payments/mobileMoney.ts`, override with `FLW_PRICES`); a third "Mobile money" tab in the plan dialog. Flutterwave is **not** a merchant of record: you are the seller and handle local tax. |
 | **Payments** | Kenya: M-Pesa or card. Everywhere else: Paddle checkout (cards everywhere, PayPal, Apple/Google Pay except India and Turkey, UPI in India, Pix in Brazil, Alipay/WeChat Pay in China, iDEAL, Bancontact, BLIK, MB WAY, KakaoPay/Naver Pay). "Ways to pay in {country}" is shown before checkout. Paddle is the **merchant of record**, so it collects and files VAT/GST/sales tax worldwide. |
 | **Phone numbers** | Parsed with libphonenumber in the user's country, stored as E.164. SMS goes only to countries Africa's Talking covers (`AT_SMS_COUNTRIES`); email works everywhere. |
 | **Privacy (GDPR/DPA)** | "Download my data" (JSON) and "Delete my account" (cancels any Paddle subscription, then erases everything). Only essential cookies are used, so no cookie banner is needed. |
@@ -151,7 +154,8 @@ App Platform, Render, Fly.io, AWS ECS). Scale web horizontally; one or two worke
 - Allow only Cloudflare's IP ranges to reach the origin. The app trusts `CF-Connecting-IP` for rate limits.
 - Add a WAF rate-limit rule on `/api/auth/*` as an outer layer.
 - Optional: create a Turnstile widget and set `TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY`.
-- Leave `/api/mpesa/callback/*` unchallenged (no bot fight or JS challenge), since Safaricom must reach it.
+- Leave `/api/mpesa/callback/*`, `/api/paddle/webhook` and `/api/flutterwave/webhook` unchallenged (no bot
+  fight or JS challenge), since Safaricom, Paddle and Flutterwave must reach them.
 
 ### 4. M-Pesa (Daraja)
 1. Create an app at developer.safaricom.co.ke with Lipa Na M-Pesa Online.
@@ -185,12 +189,36 @@ App Platform, Render, Fly.io, AWS ECS). Scale web horizontally; one or two worke
    Alipay/WeChat Pay (China), iDEAL, Bancontact, BLIK and MB WAY. Some are early access or need
    approval. Then update `src/server/payments/methods.ts` to match what you enabled.
 
-### 6. ZeptoMail
+### 6. Flutterwave (MTN MoMo, Airtel Money and other mobile money)
+1. Open a Flutterwave business account for your Kenyan company and confirm with Flutterwave which
+   collection countries they'll enable for it (Uganda, Tanzania, Rwanda, Zambia, Ghana, Francophone
+   Africa). Restrict the app to those with `FLW_COUNTRIES=UG,TZ,...`.
+2. **Tax first:** Flutterwave isn't a merchant of record. Once your sales in a country pass its
+   threshold you may need to register for VAT / digital services tax there (Uganda, Tanzania, Ghana,
+   Rwanda, Zambia and others tax foreign digital services). Ask your accountant before switching a
+   country on.
+3. In the dashboard (test mode first): Settings → Webhooks → URL
+   `https://<your domain>/api/flutterwave/webhook`, a long random **Secret hash** (same value in
+   `FLW_WEBHOOK_HASH`), and enable webhook retries. Both `verif-hash` and `flutterwave-signature`
+   headers are accepted.
+4. Set `FLW_ENV=test` and `FLW_SECRET_KEY` (test `FLWSECK_TEST-…`), pay with Flutterwave's test
+   mobile money numbers, then switch to `FLW_ENV=live` with live keys.
+5. Prices are fixed per currency in `src/server/payments/mobileMoney.ts` (≈ USD 3 / 8 / 29). Change
+   them with `FLW_PRICES='{"UGX":[11000,29000,105000]}'` (monthly, quarterly, yearly, major units).
+6. How a payment settles: the app creates a pending payment, sends the customer to Flutterwave's
+   hosted page (they pick MTN/Airtel/… and approve on their phone), and Flutterwave returns them to
+   `/app?momo=<id>`. Access is extended only after Flutterwave's API confirms the payment **and** the
+   amount and currency match, whether that's via the webhook, the dialog's polling or the worker's
+   per-minute reconciliation. Replays are harmless; underpayments are recorded as failed with
+   "Amount mismatch" for manual review; a payment confirmed after the one-hour timeout still applies.
+7. Mobile money here is prepaid (no automatic renewal): the renewal reminder brings customers back.
+
+### 7. ZeptoMail
 Verify your sending domain (SPF + DKIM records, which you add in Cloudflare DNS), create a Mail Agent,
 copy its **Send Mail token** into `ZEPTOMAIL_TOKEN`, set `MAIL_FROM_ADDRESS` on that domain, and
 `NOTIFY_ENV=live`. Use the `.eu` or `.in` API URL if your Zoho account is in that data centre.
 
-### 7. Africa's Talking
+### 8. Africa's Talking
 Create an app, buy SMS credit, request an alphanumeric sender ID (optional), and set `AT_USERNAME` /
 `AT_API_KEY`. Test with `AT_USERNAME=sandbox` first. Reset codes and renewal reminders go by SMS to
 users who saved a phone number in a country listed in `AT_SMS_COUNTRIES`; everyone else gets email.
@@ -198,6 +226,8 @@ users who saved a phone number in a country listed in `AT_SMS_COUNTRIES`; everyo
 ### Production checklist
 - [ ] `PUBLIC_URL` is https; `MPESA_CALLBACK_SECRET` is long and random
 - [ ] Paddle live: client token, API key, webhook secret and price ids set; a real purchase tested
+- [ ] Flutterwave live: secret key and webhook hash set, `FLW_COUNTRIES` limited to what's enabled on
+      your account, tax registration checked per country, a real MoMo payment tested
 - [ ] Native-speaker review of every translation in `src/i18n/messages/`
 - [ ] `JOBS_INLINE=0` with at least one worker running
 - [ ] `NOTIFY_ENV=live` with ZeptoMail and/or Africa's Talking configured
@@ -214,10 +244,7 @@ users who saved a phone number in a country listed in `AT_SMS_COUNTRIES`; everyo
 - Phone-number sign-in with an SMS code
 - Import an existing workbook (.xlsx) in this layout
 - Alert by SMS when the projection goes negative within N days
-- **Mobile money beyond Kenya:** Paddle has none, and in much of Africa that's how people pay.
-  Add a second `PaymentProvider` for MTN MoMo and Airtel Money (Uganda, Tanzania, Ghana, Rwanda,
-  Zambia), e.g. Paystack or Flutterwave. They aren't merchants of record, so check tax obligations
-  in each country first.
+- Mobile money in Nigeria (bank transfer / USSD via Flutterwave) and Malawi, once confirmed on your account
 - Language-prefixed URLs (`/fr`, `/de`, …) with hreflang, for search engines in each language
 - Professional translation review, then a translation platform (Crowdin/Lokalise) for ongoing updates
 - More languages on demand: Tamil, Telugu, Marathi, Persian (Afghanistan), Hebrew, Filipino

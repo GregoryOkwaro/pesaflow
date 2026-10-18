@@ -123,6 +123,9 @@ export const it: Messages = {
     manage: "Gestisci abbonamento", cancelSub: "Disdici abbonamento", cardRenews: "L'abbonamento con carta si rinnova automaticamente.",
     cardCanceled: "L'abbonamento con carta è disdetto e non si rinnoverà.",
     waysToPay: "Metodi di pagamento in {country}", approxNote: "Gli importi con ≈ sono approssimativi, al cambio di oggi. Al pagamento vedrai il prezzo esatto, tasse incluse.",
+    mobileTab: "Mobile money", payMobile: "Paga con mobile money", mobileButton: "Continua per pagare {amount}",
+    mobileHint: "Sceglierai il tuo operatore sulla pagina sicura di Flutterwave e approverai il pagamento sul telefono. Prepagato: non si rinnova automaticamente.",
+    mobileWaiting: "In attesa della conferma del pagamento mobile money…",
   },
   settings: {
     thisBudget: "Questo budget", horizon: "Giorni di previsione", horizonHint: "Il foglio originale prevede 31 giorni.",
@@ -200,5 +203,7 @@ export const it: Messages = {
     currencyInvalid: "Scegli una valuta valida.", localeInvalid: "Scegli una lingua supportata.",
     cardUnavailable: "I pagamenti con carta non sono ancora disponibili.",
     cardSubscriptionActive: "Hai già un abbonamento con carta attivo. Gestiscilo dalle Impostazioni.",
+    mobileMoneyUnavailable: "Il mobile money non è ancora disponibile nel tuo paese.",
+    mobileMoneyTimeout: "Il pagamento mobile money non è stato completato. Riprova.",
   },
 };

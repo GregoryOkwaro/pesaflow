@@ -6,7 +6,8 @@ import { api, ApiClientError } from "@/lib/api";
 import { CURRENCY_CODES, currencyName } from "@/lib/countries";
 import { currencyExponent, formatMoney, normalizeAmountInput, toInputString } from "@/lib/money";
 import { loadPaddle, paddleLocale, setPaddleEventHandler } from "./paddle";
-import type { Account, BudgetPayload, Item, Me, Payment, PaymentConfig, Plan } from "./types";
+import { PaddlePrice } from "../PaddlePrice";
+import type { Account, BudgetPayload, Item, Me, Payment, PaymentConfig, Plan, Pricing } from "./types";
 import { FormError, Modal, useFmt } from "./ui";
 
 const errMsg = (e: unknown) => (e instanceof ApiClientError && e.status === 402 ? "" : (e as Error).message);
@@ -194,8 +195,8 @@ export function NewBudgetDialog({ copyFrom, suggested, defaultCurrency, onCreate
 
 // ---------------------------------------------------------------- billing (M-Pesa + Paddle)
 
-export function BillingDialog({ me, plans, config, reason, onUser, onClose }: {
-  me: Me; plans: Plan[]; config: PaymentConfig; reason?: string; onUser: (u: Me) => void; onClose: () => void;
+export function BillingDialog({ me, plans, pricing, config, reason, onUser, onClose }: {
+  me: Me; plans: Plan[]; pricing: Pricing; config: PaymentConfig; reason?: string; onUser: (u: Me) => void; onClose: () => void;
 }) {
   const { t, tMaybe, locale } = useT();
   const f = useFmt("KES");
@@ -294,7 +295,18 @@ export function BillingDialog({ me, plans, config, reason, onUser, onClose }: {
     }
   }
 
-  const priceLabel = (p: Plan) => (method === "mpesa" ? f.money(p.kes) : formatMoney(p.usd, "USD", locale));
+  const approx = (key: Plan["key"]) => pricing.plans.find((x) => x.key === key)?.approxLocal ?? null;
+  const priceLabel = (p: Plan) => {
+    if (method === "mpesa") return f.money(p.kes);
+    const a = approx(p.key);
+    return (
+      <PaddlePrice priceId={p.paddlePriceId} country={pricing.country} token={config.paddleClientToken} env={config.paddleEnv}
+        fallback={<>{formatMoney(p.usd, "USD", locale)}{a !== null && <span className="approx">≈ {formatMoney(a, pricing.localCurrency, locale)}</span>}</>} />
+    );
+  };
+  const countryName = (() => {
+    try { return new Intl.DisplayNames([locale, "en"], { type: "region" }).of(pricing.country) ?? pricing.country; } catch { return pricing.country; }
+  })();
   const per = (k: Plan["key"]) => t(k === "monthly" ? "billing.perMonth" : k === "quarterly" ? "billing.perQuarter" : "billing.perYear");
 
   let content;
@@ -355,7 +367,14 @@ export function BillingDialog({ me, plans, config, reason, onUser, onClose }: {
             {cardActive ? <div className="alert ok">{t("billing.cardRenews")}</div> : (
               <button className="btn primary full" onClick={payCard} disabled={busy || !config.cardEnabled}>{config.cardEnabled ? t("billing.payCard") : t("errors.cardUnavailable")}</button>
             )}
+            {pricing.methods.length > 0 && (
+              <>
+                <div className="small muted font-bold">{t("billing.waysToPay", { country: countryName })}</div>
+                <div className="methods">{pricing.methods.filter((m) => m !== "M-Pesa").map((m) => <span key={m} className="chip">{m}</span>)}</div>
+              </>
+            )}
             <p className="hint">{t("billing.cardHint")}{config.paddleEnv === "mock" && <b> {t("billing.testMode")}</b>}{config.paddleEnv === "sandbox" && <b> {t("billing.sandboxMode")}</b>}</p>
+            {pricing.plans.some((x) => x.approxLocal !== null) && <p className="hint">{t("billing.approxNote", { currency: pricing.localCurrency })}</p>}
           </>
         )}
       </>

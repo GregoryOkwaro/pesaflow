@@ -11,6 +11,7 @@ export const zhHant: Messages = {
     continue: "繼續", tryAgain: "重試", areYouSure: "確定嗎？", logIn: "登入", logOut: "登出",
     language: "語言", country: "國家/地區", timezone: "時區", currency: "貨幣", today: "今天",
     offline: "你似乎已離線，請檢查網路連線。",
+    availableIn: "PesaFlow 也提供{language}版本。", switchLanguage: "切換",
   },
   landing: {
     startFree: "免費開始",
@@ -121,6 +122,7 @@ export const zhHant: Messages = {
     cardDone: "謝謝！正在確認你的付款，只需幾秒鐘。",
     manage: "管理訂閱", cancelSub: "取消訂閱", cardRenews: "你的信用卡訂閱會自動續訂。",
     cardCanceled: "你的信用卡訂閱已取消，不會續訂。",
+    waysToPay: "{country}的付款方式", approxNote: "帶 ≈ 的金額為依今日匯率估算。結帳時會顯示含稅的準確價格。",
   },
   settings: {
     thisBudget: "目前預算", horizon: "預測天數", horizonHint: "原始試算表預測未來 31 天。",

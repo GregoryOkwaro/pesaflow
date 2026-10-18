@@ -11,6 +11,7 @@ export const ru: Messages = {
     continue: "Продолжить", tryAgain: "Повторить", areYouSure: "Вы уверены?", logIn: "Войти", logOut: "Выйти",
     language: "Язык", country: "Страна", timezone: "Часовой пояс", currency: "Валюта", today: "сегодня",
     offline: "Похоже, вы не в сети. Проверьте подключение.",
+    availableIn: "PesaFlow также доступен на языке: {language}.", switchLanguage: "Переключить",
   },
   landing: {
     startFree: "Начать бесплатно",
@@ -121,6 +122,7 @@ export const ru: Messages = {
     cardDone: "Спасибо! Подтверждаем ваш платёж. Это займёт несколько секунд.",
     manage: "Управлять подпиской", cancelSub: "Отменить подписку", cardRenews: "Подписка по карте продлевается автоматически.",
     cardCanceled: "Подписка по карте отменена и не будет продлена.",
+    waysToPay: "Способы оплаты: {country}", approxNote: "Суммы со знаком ≈ приблизительные, по сегодняшнему курсу. При оплате вы увидите точную цену с налогами.",
   },
   settings: {
     thisBudget: "Этот бюджет", horizon: "Дней прогноза", horizonHint: "Исходная таблица прогнозирует на 31 день вперёд.",

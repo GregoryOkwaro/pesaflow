@@ -11,6 +11,7 @@ Object.assign(process.env, {
   NOTIFY_ENV: "mock",
   JOBS_INLINE: "1",
   RATE_LIMIT_DISABLED: "1",
+  FX_AUTO_REFRESH: "0", // tests never call the live exchange-rate API
   PUBLIC_URL: "http://localhost:3000",
 });
 

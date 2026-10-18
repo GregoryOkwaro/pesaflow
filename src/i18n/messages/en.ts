@@ -13,6 +13,7 @@ export const en = {
     continue: "Continue", tryAgain: "Try again", areYouSure: "Are you sure?", logIn: "Log in", logOut: "Log out",
     language: "Language", country: "Country", timezone: "Time zone", currency: "Currency", today: "today",
     offline: "You appear to be offline. Check your connection.",
+    availableIn: "PesaFlow is also available in {language}.", switchLanguage: "Switch",
   },
   landing: {
     startFree: "Start free",
@@ -123,6 +124,7 @@ export const en = {
     cardDone: "Thanks! Your payment is being confirmed. This takes a few seconds.",
     manage: "Manage subscription", cancelSub: "Cancel subscription", cardRenews: "Your card subscription renews automatically.",
     cardCanceled: "Your card subscription is cancelled and won't renew.",
+    waysToPay: "Ways to pay in {country}", approxNote: "Amounts marked ≈ are approximate, at today's exchange rate. Checkout shows the exact price, including any tax.",
   },
   settings: {
     thisBudget: "This budget", horizon: "Days to project", horizonHint: "The original spreadsheet looks 31 days ahead.",

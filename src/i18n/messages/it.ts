@@ -11,6 +11,7 @@ export const it: Messages = {
     continue: "Continua", tryAgain: "Riprova", areYouSure: "Sei sicuro?", logIn: "Accedi", logOut: "Esci",
     language: "Lingua", country: "Paese", timezone: "Fuso orario", currency: "Valuta", today: "oggi",
     offline: "Sembra che tu sia offline. Controlla la connessione.",
+    availableIn: "PesaFlow è disponibile anche in {language}.", switchLanguage: "Cambia",
   },
   landing: {
     startFree: "Inizia gratis",
@@ -121,6 +122,7 @@ export const it: Messages = {
     cardDone: "Grazie! Stiamo confermando il pagamento. Ci vorrà qualche secondo.",
     manage: "Gestisci abbonamento", cancelSub: "Disdici abbonamento", cardRenews: "L'abbonamento con carta si rinnova automaticamente.",
     cardCanceled: "L'abbonamento con carta è disdetto e non si rinnoverà.",
+    waysToPay: "Metodi di pagamento in {country}", approxNote: "Gli importi con ≈ sono approssimativi, al cambio di oggi. Al pagamento vedrai il prezzo esatto, tasse incluse.",
   },
   settings: {
     thisBudget: "Questo budget", horizon: "Giorni di previsione", horizonHint: "Il foglio originale prevede 31 giorni.",

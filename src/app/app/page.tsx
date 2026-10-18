@@ -7,6 +7,7 @@ import { paymentConfig, planList } from "@/server/env";
 import { userToday } from "@/server/services/billing";
 import { budgetPayload, listBudgets } from "@/server/services/budgets";
 import { userJson } from "@/server/services/users";
+import { pricingFor } from "@/server/pricing";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: { absolute: "PesaFlow" } };
@@ -20,7 +21,7 @@ export default async function AppPage() {
   const initial = await budgetPayload(user.id, id, userToday(user));
   return (
     <Suspense>
-      <BudgetApp me={userJson(user)} plans={planList()} payments={paymentConfig()} budgets={budgets} initial={initial} />
+      <BudgetApp me={userJson(user)} plans={planList()} payments={paymentConfig()} pricing={await pricingFor(user.country)} budgets={budgets} initial={initial} />
     </Suspense>
   );
 }

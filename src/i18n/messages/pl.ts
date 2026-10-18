@@ -11,6 +11,7 @@ export const pl: Messages = {
     continue: "Dalej", tryAgain: "Spróbuj ponownie", areYouSure: "Czy na pewno?", logIn: "Zaloguj się", logOut: "Wyloguj się",
     language: "Język", country: "Kraj", timezone: "Strefa czasowa", currency: "Waluta", today: "dziś",
     offline: "Wygląda na to, że jesteś offline. Sprawdź połączenie.",
+    availableIn: "PesaFlow jest dostępny także w języku: {language}.", switchLanguage: "Zmień",
   },
   landing: {
     startFree: "Zacznij za darmo",
@@ -121,6 +122,7 @@ export const pl: Messages = {
     cardDone: "Dziękujemy! Potwierdzamy płatność. To potrwa kilka sekund.",
     manage: "Zarządzaj subskrypcją", cancelSub: "Anuluj subskrypcję", cardRenews: "Subskrypcja kartą odnawia się automatycznie.",
     cardCanceled: "Subskrypcja kartą została anulowana i nie zostanie odnowiona.",
+    waysToPay: "Metody płatności: {country}", approxNote: "Kwoty oznaczone ≈ są przybliżone, według dzisiejszego kursu. Przy płatności zobaczysz dokładną cenę z podatkiem.",
   },
   settings: {
     thisBudget: "Ten budżet", horizon: "Dni prognozy", horizonHint: "Oryginalny arkusz prognozuje 31 dni do przodu.",

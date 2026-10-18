@@ -6,7 +6,7 @@ import { useT } from "@/i18n/client";
 import { api, onApiError } from "@/lib/api";
 import { AccountDialog, BillingDialog, ItemDialog, NewBudgetDialog } from "./Dialogs";
 import { Settings } from "./Settings";
-import type { Account, BudgetPayload, BudgetSummary, Item, Me, PaymentConfig, Plan, Tab } from "./types";
+import type { Account, BudgetPayload, BudgetSummary, Item, Me, PaymentConfig, Plan, Pricing, Tab } from "./types";
 import { Confirm } from "./ui";
 import { Daily, Items, Overview, SubscriptionBanner } from "./Views";
 
@@ -20,7 +20,7 @@ type Dialog =
 
 const TAB_ICONS: Record<Tab, string> = { overview: "▦", items: "☰", daily: "▤", settings: "⚙" };
 
-export function BudgetApp(props: { me: Me; plans: Plan[]; payments: PaymentConfig; budgets: BudgetSummary[]; initial: BudgetPayload }) {
+export function BudgetApp(props: { me: Me; plans: Plan[]; payments: PaymentConfig; pricing: Pricing; budgets: BudgetSummary[]; initial: BudgetPayload }) {
   const { t, tp, locale } = useT();
   const router = useRouter();
   const search = useSearchParams();
@@ -150,7 +150,7 @@ export function BudgetApp(props: { me: Me; plans: Plan[]; payments: PaymentConfi
           onDelete={(a) => setDialog({ kind: "confirm", okLabel: t("common.delete"), message: t("accountDialog.confirmDelete", { name: a.name }), onOk: () => mutate("DELETE", `/api/accounts/${a.id}`, undefined, t("accountDialog.deleted")) })} />
       )}
       {dialog?.kind === "billing" && (
-        <BillingDialog me={me} plans={props.plans} config={props.payments} reason={dialog.reason} onUser={setMe} onClose={() => setDialog(null)} />
+        <BillingDialog me={me} plans={props.plans} pricing={props.pricing} config={props.payments} reason={dialog.reason} onUser={setMe} onClose={() => setDialog(null)} />
       )}
       {dialog?.kind === "newBudget" && (
         <NewBudgetDialog

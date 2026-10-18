@@ -11,6 +11,7 @@ export const ja: Messages = {
     continue: "続ける", tryAgain: "もう一度試す", areYouSure: "よろしいですか？", logIn: "ログイン", logOut: "ログアウト",
     language: "言語", country: "国・地域", timezone: "タイムゾーン", currency: "通貨", today: "今日",
     offline: "オフラインのようです。接続を確認してください。",
+    availableIn: "PesaFlow は{language}でもご利用いただけます。", switchLanguage: "切り替える",
   },
   landing: {
     startFree: "無料で始める",
@@ -121,6 +122,7 @@ export const ja: Messages = {
     cardDone: "ありがとうございます！お支払いを確認しています。数秒かかります。",
     manage: "サブスクリプションを管理", cancelSub: "サブスクリプションを解約", cardRenews: "カードのサブスクリプションは自動更新されます。",
     cardCanceled: "カードのサブスクリプションは解約済みで、更新されません。",
+    waysToPay: "{country}での支払い方法", approxNote: "≈ の付いた金額は本日の為替レートによる概算です。お支払い画面には税込みの正確な価格が表示されます。",
   },
   settings: {
     thisBudget: "この予算", horizon: "予測日数", horizonHint: "元のスプレッドシートは31日先まで予測します。",

@@ -11,6 +11,7 @@ export const ko: Messages = {
     continue: "계속", tryAgain: "다시 시도", areYouSure: "확실한가요?", logIn: "로그인", logOut: "로그아웃",
     language: "언어", country: "국가/지역", timezone: "시간대", currency: "통화", today: "오늘",
     offline: "오프라인 상태인 것 같습니다. 연결을 확인하세요.",
+    availableIn: "PesaFlow는 {language}로도 이용할 수 있습니다.", switchLanguage: "전환",
   },
   landing: {
     startFree: "무료로 시작",
@@ -121,6 +122,7 @@ export const ko: Messages = {
     cardDone: "감사합니다! 결제를 확인하고 있습니다. 몇 초 정도 걸립니다.",
     manage: "구독 관리", cancelSub: "구독 해지", cardRenews: "카드 구독은 자동으로 갱신됩니다.",
     cardCanceled: "카드 구독이 해지되어 갱신되지 않습니다.",
+    waysToPay: "{country}의 결제 수단", approxNote: "≈ 표시 금액은 오늘 환율 기준 대략적인 값입니다. 결제 화면에 세금을 포함한 정확한 가격이 표시됩니다.",
   },
   settings: {
     thisBudget: "이 예산", horizon: "예측 일수", horizonHint: "원래 스프레드시트는 31일 앞까지 예측합니다.",

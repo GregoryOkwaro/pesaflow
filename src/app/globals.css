@@ -263,3 +263,8 @@ table.daygrid tr.detail td { text-align: start; background: var(--surface-2); wh
 /* Time runs left-to-right in charts in every language; labels must anchor accordingly. */
 .chart { direction: ltr; }
 [dir="rtl"] .chart-tip { text-align: start; }
+.lang-suggest { display: flex; align-items: center; gap: 10px; justify-content: center; flex-wrap: wrap; padding: 8px 16px; background: var(--brand-soft); color: var(--text); font-size: 14px; }
+.lang-suggest .close { border: 0; background: transparent; font-size: 20px; cursor: pointer; color: var(--muted); line-height: 1; padding: 2px 6px; }
+.approx { display: block; font-size: 12px; font-weight: 600; color: var(--muted); }
+.methods { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 12px; }
+.methods .chip { font-size: 12px; }

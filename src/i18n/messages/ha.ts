@@ -11,6 +11,7 @@ export const ha: Messages = {
     continue: "Ci gaba", tryAgain: "Sake gwadawa", areYouSure: "Ka tabbata?", logIn: "Shiga", logOut: "Fita",
     language: "Harshe", country: "Ƙasa", timezone: "Yankin lokaci", currency: "Kuɗi", today: "yau",
     offline: "Da alama ba ka da intanet. Duba haɗin ka.",
+    availableIn: "Ana samun PesaFlow da {language} kuma.", switchLanguage: "Canza",
   },
   landing: {
     startFree: "Fara kyauta",
@@ -121,6 +122,7 @@ export const ha: Messages = {
     cardDone: "Mun gode! Ana tabbatar da biyanka. Zai ɗauki 'yan daƙiƙoƙi.",
     manage: "Sarrafa rajista", cancelSub: "Soke rajista", cardRenews: "Rajistar katinka tana sabuntawa kai tsaye.",
     cardCanceled: "An soke rajistar katinka kuma ba za ta sabunta ba.",
+    waysToPay: "Hanyoyin biya a {country}", approxNote: "Adadin da ke da ≈ ƙiyasi ne bisa farashin canji na yau. Lokacin biya za a nuna ainihin farashi, har da haraji.",
   },
   settings: {
     thisBudget: "Wannan kasafi", horizon: "Kwanakin hasashe", horizonHint: "Takardar asali tana hasashen kwanaki 31 a gaba.",

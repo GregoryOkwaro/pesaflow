@@ -11,6 +11,7 @@ export const vi: Messages = {
     continue: "Tiếp tục", tryAgain: "Thử lại", areYouSure: "Bạn có chắc không?", logIn: "Đăng nhập", logOut: "Đăng xuất",
     language: "Ngôn ngữ", country: "Quốc gia", timezone: "Múi giờ", currency: "Tiền tệ", today: "hôm nay",
     offline: "Có vẻ bạn đang ngoại tuyến. Hãy kiểm tra kết nối.",
+    availableIn: "PesaFlow cũng có bằng {language}.", switchLanguage: "Chuyển",
   },
   landing: {
     startFree: "Bắt đầu miễn phí",
@@ -121,6 +122,7 @@ export const vi: Messages = {
     cardDone: "Cảm ơn bạn! Thanh toán đang được xác nhận, chỉ mất vài giây.",
     manage: "Quản lý gói đăng ký", cancelSub: "Hủy gói đăng ký", cardRenews: "Gói đăng ký bằng thẻ của bạn tự động gia hạn.",
     cardCanceled: "Gói đăng ký bằng thẻ đã bị hủy và sẽ không gia hạn.",
+    waysToPay: "Cách thanh toán tại {country}", approxNote: "Số tiền có dấu ≈ là ước tính theo tỷ giá hôm nay. Trang thanh toán hiển thị giá chính xác, đã gồm thuế.",
   },
   settings: {
     thisBudget: "Ngân sách này", horizon: "Số ngày dự báo", horizonHint: "Bảng tính gốc dự báo 31 ngày tới.",

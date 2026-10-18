@@ -11,6 +11,7 @@ export const ur: Messages = {
     continue: "جاری رکھیں", tryAgain: "دوبارہ کوشش کریں", areYouSure: "کیا آپ کو یقین ہے؟", logIn: "لاگ اِن", logOut: "لاگ آؤٹ",
     language: "زبان", country: "ملک", timezone: "ٹائم زون", currency: "کرنسی", today: "آج",
     offline: "لگتا ہے آپ آف لائن ہیں۔ اپنا کنکشن چیک کریں۔",
+    availableIn: "PesaFlow {language} میں بھی دستیاب ہے۔", switchLanguage: "تبدیل کریں",
   },
   landing: {
     startFree: "مفت شروع کریں",
@@ -121,6 +122,7 @@ export const ur: Messages = {
     cardDone: "شکریہ! آپ کی ادائیگی کی تصدیق ہو رہی ہے۔ اس میں چند سیکنڈ لگتے ہیں۔",
     manage: "سبسکرپشن کا انتظام کریں", cancelSub: "سبسکرپشن منسوخ کریں", cardRenews: "آپ کی کارڈ سبسکرپشن خود بخود تجدید ہوتی ہے۔",
     cardCanceled: "آپ کی کارڈ سبسکرپشن منسوخ ہو گئی ہے اور تجدید نہیں ہوگی۔",
+    waysToPay: "{country} میں ادائیگی کے طریقے", approxNote: "≈ والی رقوم آج کی شرحِ مبادلہ کے مطابق تخمینی ہیں۔ چیک آؤٹ پر ٹیکس سمیت درست قیمت دکھائی جاتی ہے۔",
   },
   settings: {
     thisBudget: "یہ بجٹ", horizon: "پیش گوئی کے دن", horizonHint: "اصل اسپریڈشیٹ 31 دن آگے تک دیکھتی ہے۔",

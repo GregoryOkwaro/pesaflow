@@ -11,6 +11,7 @@ export const am: Messages = {
     continue: "ቀጥል", tryAgain: "እንደገና ሞክር", areYouSure: "እርግጠኛ ነዎት?", logIn: "ግባ", logOut: "ውጣ",
     language: "ቋንቋ", country: "አገር", timezone: "የሰዓት ሰቅ", currency: "ምንዛሬ", today: "ዛሬ",
     offline: "ከመስመር ውጭ ይመስላሉ። ግንኙነትዎን ያረጋግጡ።",
+    availableIn: "PesaFlow በ{language}ም ይገኛል።", switchLanguage: "ቀይር",
   },
   landing: {
     startFree: "በነጻ ይጀምሩ",
@@ -121,6 +122,7 @@ export const am: Messages = {
     cardDone: "እናመሰግናለን! ክፍያዎ በማረጋገጥ ላይ ነው። ጥቂት ሰከንዶች ይወስዳል።",
     manage: "የደንበኝነት ምዝገባን አስተዳድር", cancelSub: "የደንበኝነት ምዝገባን ሰርዝ", cardRenews: "የካርድ ምዝገባዎ በራስ-ሰር ይታደሳል።",
     cardCanceled: "የካርድ ምዝገባዎ ተሰርዟል እና አይታደስም።",
+    waysToPay: "በ{country} የመክፈያ መንገዶች", approxNote: "≈ ምልክት ያላቸው መጠኖች በዛሬው የምንዛሬ ተመን ግምታዊ ናቸው። በክፍያ ጊዜ ትክክለኛው ዋጋ ከግብር ጋር ይታያል።",
   },
   settings: {
     thisBudget: "ይህ በጀት", horizon: "የትንበያ ቀናት", horizonHint: "የመጀመሪያው የተመን ሉህ 31 ቀናት ወደፊት ይመለከታል።",

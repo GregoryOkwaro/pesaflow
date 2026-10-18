@@ -11,6 +11,7 @@ export const zhHans: Messages = {
     continue: "继续", tryAgain: "重试", areYouSure: "确定吗？", logIn: "登录", logOut: "退出登录",
     language: "语言", country: "国家/地区", timezone: "时区", currency: "货币", today: "今天",
     offline: "你似乎已离线，请检查网络连接。",
+    availableIn: "PesaFlow 也提供{language}版本。", switchLanguage: "切换",
   },
   landing: {
     startFree: "免费开始",
@@ -121,6 +122,7 @@ export const zhHans: Messages = {
     cardDone: "谢谢！正在确认你的付款，只需几秒钟。",
     manage: "管理订阅", cancelSub: "取消订阅", cardRenews: "你的银行卡订阅会自动续订。",
     cardCanceled: "你的银行卡订阅已取消，不会续订。",
+    waysToPay: "{country}的支付方式", approxNote: "带 ≈ 的金额为按今日汇率估算。结账时会显示含税的准确价格。",
   },
   settings: {
     thisBudget: "当前预算", horizon: "预测天数", horizonHint: "原始电子表格预测未来 31 天。",

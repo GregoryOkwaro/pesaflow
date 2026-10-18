@@ -11,6 +11,7 @@ export const fr: Messages = {
     continue: "Continuer", tryAgain: "Réessayer", areYouSure: "Êtes-vous sûr ?", logIn: "Se connecter", logOut: "Se déconnecter",
     language: "Langue", country: "Pays", timezone: "Fuseau horaire", currency: "Devise", today: "aujourd'hui",
     offline: "Vous semblez hors ligne. Vérifiez votre connexion.",
+    availableIn: "PesaFlow est aussi disponible en {language}.", switchLanguage: "Changer",
   },
   landing: {
     startFree: "Commencer gratuitement",
@@ -121,6 +122,7 @@ export const fr: Messages = {
     cardDone: "Merci ! Votre paiement est en cours de confirmation. Cela prend quelques secondes.",
     manage: "Gérer l'abonnement", cancelSub: "Résilier l'abonnement", cardRenews: "Votre abonnement par carte se renouvelle automatiquement.",
     cardCanceled: "Votre abonnement par carte est résilié et ne sera pas renouvelé.",
+    waysToPay: "Moyens de paiement : {country}", approxNote: "Les montants marqués ≈ sont approximatifs, au taux de change du jour. Le paiement affiche le prix exact, taxes comprises.",
   },
   settings: {
     thisBudget: "Ce budget", horizon: "Jours de prévision", horizonHint: "Le tableur d'origine prévoit 31 jours.",

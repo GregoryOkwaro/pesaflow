@@ -6,6 +6,8 @@ interface PaddleJs {
   Environment: { set: (env: "sandbox") => void };
   Initialize: (opts: { token: string; eventCallback?: (e: PaddleEvent) => void }) => void;
   Checkout: { open: (opts: Record<string, unknown>) => void; close: () => void };
+  PricePreview?: (req: { items: { priceId: string; quantity: number }[]; address?: { countryCode: string } }) =>
+    Promise<{ data?: { details?: { lineItems?: { formattedTotals?: { total?: string } }[] } } }>;
 }
 declare global { interface Window { Paddle?: PaddleJs } }
 

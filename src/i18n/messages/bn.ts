@@ -11,6 +11,7 @@ export const bn: Messages = {
     continue: "চালিয়ে যান", tryAgain: "আবার চেষ্টা করুন", areYouSure: "আপনি কি নিশ্চিত?", logIn: "লগ ইন", logOut: "লগ আউট",
     language: "ভাষা", country: "দেশ", timezone: "সময় অঞ্চল", currency: "মুদ্রা", today: "আজ",
     offline: "মনে হচ্ছে আপনি অফলাইনে আছেন। সংযোগ পরীক্ষা করুন।",
+    availableIn: "PesaFlow {language}-তেও পাওয়া যায়।", switchLanguage: "বদলান",
   },
   landing: {
     startFree: "বিনামূল্যে শুরু করুন",
@@ -121,6 +122,7 @@ export const bn: Messages = {
     cardDone: "ধন্যবাদ! আপনার পেমেন্ট নিশ্চিত করা হচ্ছে। কয়েক সেকেন্ড লাগবে।",
     manage: "সাবস্ক্রিপশন পরিচালনা", cancelSub: "সাবস্ক্রিপশন বাতিল", cardRenews: "আপনার কার্ড সাবস্ক্রিপশন স্বয়ংক্রিয়ভাবে নবায়ন হয়।",
     cardCanceled: "আপনার কার্ড সাবস্ক্রিপশন বাতিল হয়েছে এবং নবায়ন হবে না।",
+    waysToPay: "{country}-এ পরিশোধের উপায়", approxNote: "≈ চিহ্নিত পরিমাণ আজকের বিনিময় হারে আনুমানিক। চেকআউটে করসহ সঠিক মূল্য দেখানো হয়।",
   },
   settings: {
     thisBudget: "এই বাজেট", horizon: "পূর্বাভাসের দিন", horizonHint: "মূল স্প্রেডশিট ৩১ দিন আগে পর্যন্ত দেখে।",

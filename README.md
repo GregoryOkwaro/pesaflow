@@ -90,8 +90,12 @@ days match.
 | **Typing numbers** | Input follows the user's locale: `1.250,50` (German, French, Spanish, Indonesian…), `1,250.50` (English, Hindi…), Arabic-Indic digits `١٢٥٠`, full-width digits `１２５０` from Chinese and Japanese keyboards, Devanagari, Bengali and Thai digits. |
 | **Currency** | Each budget has an ISO 4217 currency. Amounts are integers in that currency's *minor units*, so JPY has no decimals and KWD has 3. Formatting follows the user's locale (`1.250,50 EUR` in German). |
 | **Time zone** | Each user has an IANA zone (detected at sign-up). "Today", due dates, trial ends and reminder times are all in the user's zone. |
-| **Country** | Picked at sign-up (pre-filled from Cloudflare's `CF-IPCountry` or the browser language). Sets the default currency, the phone-number format and the payment options. |
-| **Payments** | Kenya: M-Pesa or card. Everywhere else: Paddle checkout (cards, PayPal, Apple/Google Pay, local methods) in the customer's currency. Paddle is the **merchant of record**, so it collects and files VAT/GST/sales tax worldwide. |
+| **Location** | From the visitor's IP via Cloudflare's `CF-IPCountry` header: no GPS prompt (a location permission request on a finance site scares people off, and the country is all we need). Falls back to the browser's language region. Time zone comes from the device. |
+| **Country** | Pre-filled at sign-up from the location above; editable. Sets the budget currency, phone format, price display and payment options. |
+| **Language choice** | The language set on the person's phone or browser wins (e.g. most Kenyans and Indians browse in English). The country is used only if that language isn't supported, and to offer the local one in a one-tap banner written in that language ("PesaFlow हिन्दी में भी उपलब्ध है"). It never switches language on its own. |
+| **Budget currency** | Always the user's local currency (INR in India, KES in Kenya). People budget in the money they earn and spend, never in USD. Changeable per budget. |
+| **Prices** | Kenya: exact KES for M-Pesa. Elsewhere: the USD list price with **≈ local** underneath at today's rate (daily from open.er-api.com, display only). When Paddle is live, the browser swaps in Paddle's **exact** local price including tax (`PricePreview`), so the ≈ figure is only a fallback. |
+| **Payments** | Kenya: M-Pesa or card. Everywhere else: Paddle checkout (cards everywhere, PayPal, Apple/Google Pay except India and Turkey, UPI in India, Pix in Brazil, Alipay/WeChat Pay in China, iDEAL, Bancontact, BLIK, MB WAY, KakaoPay/Naver Pay). "Ways to pay in {country}" is shown before checkout. Paddle is the **merchant of record**, so it collects and files VAT/GST/sales tax worldwide. |
 | **Phone numbers** | Parsed with libphonenumber in the user's country, stored as E.164. SMS goes only to countries Africa's Talking covers (`AT_SMS_COUNTRIES`); email works everywhere. |
 | **Privacy (GDPR/DPA)** | "Download my data" (JSON) and "Delete my account" (cancels any Paddle subscription, then erases everything). Only essential cookies are used, so no cookie banner is needed. |
 | **Sanctions** | Iran, North Korea, Cuba, Syria and Russia aren't offered at sign-up, because the payment providers can't serve them (`src/lib/countries.ts`). |
@@ -173,6 +177,13 @@ App Platform, Render, Fly.io, AWS ECS). Scale web horizontally; one or two worke
    three `PADDLE_PRICE_*` ids. Buy with Paddle's test card, then switch to `production` with live
    values.
 5. In Cloudflare, leave `/api/paddle/webhook` unchallenged, the same as the M-Pesa callback.
+6. **Local prices:** on each price, add country overrides in local currency for your main markets
+   (e.g. INR for India, BRL for Brazil, priced for local purchasing power) so customers are charged
+   in their own currency. Paddle charges in about 33 currencies (call `GET /currencies` for the
+   live list). Elsewhere, for example Kenya and Nigeria, cards are charged in USD.
+7. **Local payment methods:** in Paddle → Checkout settings, switch on UPI (India), Pix (Brazil),
+   Alipay/WeChat Pay (China), iDEAL, Bancontact, BLIK and MB WAY. Some are early access or need
+   approval. Then update `src/server/payments/methods.ts` to match what you enabled.
 
 ### 6. ZeptoMail
 Verify your sending domain (SPF + DKIM records, which you add in Cloudflare DNS), create a Mail Agent,
@@ -203,7 +214,10 @@ users who saved a phone number in a country listed in `AT_SMS_COUNTRIES`; everyo
 - Phone-number sign-in with an SMS code
 - Import an existing workbook (.xlsx) in this layout
 - Alert by SMS when the projection goes negative within N days
-- Airtel Money / MTN MoMo (add a `PaymentProvider`)
+- **Mobile money beyond Kenya:** Paddle has none, and in much of Africa that's how people pay.
+  Add a second `PaymentProvider` for MTN MoMo and Airtel Money (Uganda, Tanzania, Ghana, Rwanda,
+  Zambia), e.g. Paystack or Flutterwave. They aren't merchants of record, so check tax obligations
+  in each country first.
 - Language-prefixed URLs (`/fr`, `/de`, …) with hreflang, for search engines in each language
 - Professional translation review, then a translation platform (Crowdin/Lokalise) for ongoing updates
 - More languages on demand: Tamil, Telugu, Marathi, Persian (Afghanistan), Hebrew, Filipino

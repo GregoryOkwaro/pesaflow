@@ -11,6 +11,7 @@ export const uk: Messages = {
     continue: "Продовжити", tryAgain: "Спробувати ще", areYouSure: "Ви впевнені?", logIn: "Увійти", logOut: "Вийти",
     language: "Мова", country: "Країна", timezone: "Часовий пояс", currency: "Валюта", today: "сьогодні",
     offline: "Схоже, ви не в мережі. Перевірте з'єднання.",
+    availableIn: "PesaFlow також доступний мовою: {language}.", switchLanguage: "Перемкнути",
   },
   landing: {
     startFree: "Почати безкоштовно",
@@ -121,6 +122,7 @@ export const uk: Messages = {
     cardDone: "Дякуємо! Підтверджуємо ваш платіж. Це займе кілька секунд.",
     manage: "Керувати підпискою", cancelSub: "Скасувати підписку", cardRenews: "Підписка карткою подовжується автоматично.",
     cardCanceled: "Підписку карткою скасовано, вона не подовжиться.",
+    waysToPay: "Способи оплати: {country}", approxNote: "Суми зі знаком ≈ приблизні, за сьогоднішнім курсом. Під час оплати ви побачите точну ціну з податками.",
   },
   settings: {
     thisBudget: "Цей бюджет", horizon: "Днів прогнозу", horizonHint: "Початкова таблиця прогнозує на 31 день уперед.",

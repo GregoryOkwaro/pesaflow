@@ -3,7 +3,9 @@ import { COUNTRY_CODES, currencyForCountry } from "./countries";
 import { isTimeZone, todayIn } from "./dates";
 import { currencyExponent, formatMoney, isCurrency, normalizeAmountInput, parseMoney, toAsciiDigits, toDecimalString, toInputString } from "./money";
 import { displayPhone, normalizeMpesaPhone, normalizePhone, phoneCountry } from "@/server/payments/phone";
-import { dirOf, matchLocale, negotiateLocale, translator } from "@/i18n/translate";
+import { dirOf, matchLocale, negotiateLocale, suggestedLocale, translator } from "@/i18n/translate";
+import { paymentMethodsFor } from "@/server/payments/methods";
+import { approxFromUsd } from "@/server/services/fx";
 
 describe("money in any currency", () => {
   it("knows each currency's decimal places", () => {
@@ -133,5 +135,41 @@ describe("world languages", () => {
     expect(dirOf("ur")).toBe("rtl");
     expect(dirOf("he")).toBe("ltr");
     expect(dirOf("zh-Hans")).toBe("ltr");
+  });
+});
+
+describe("location-aware defaults", () => {
+  it("browser language wins; the country only fills in when the browser's language isn't supported", () => {
+    expect(negotiateLocale("en-US,en;q=0.9", "KE")).toBe("en"); // Kenyan with an English phone: English
+    expect(negotiateLocale("en-IN,en;q=0.9", "IN")).toBe("en"); // Indian with an English phone: English
+    expect(negotiateLocale("hi-IN,hi;q=0.9", "IN")).toBe("hi"); // Indian with a Hindi phone: Hindi
+    expect(negotiateLocale("ca-ES", "ES")).toBe("es"); // Catalan unsupported: Spain's main language
+    expect(negotiateLocale("mr-IN", "IN")).toBe("en"); // Marathi unsupported: India's web language is English
+    expect(negotiateLocale(null, "BR")).toBe("pt");
+  });
+  it("suggests the local language without forcing it", () => {
+    expect(suggestedLocale("en", "IN")).toBe("hi");
+    expect(suggestedLocale("en", "KE")).toBe("sw");
+    expect(suggestedLocale("sw", "KE")).toBeNull();
+    expect(suggestedLocale("en", "US")).toBeNull();
+    expect(suggestedLocale("en", "NG")).toBe("ha");
+  });
+  it("lists how people can pay in each country", () => {
+    expect(paymentMethodsFor("KE", { cardEnabled: true })[0]).toBe("M-Pesa");
+    const india = paymentMethodsFor("IN", { cardEnabled: true });
+    expect(india).toContain("UPI");
+    expect(india).not.toContain("Apple Pay"); // Paddle: no Apple/Google Pay in India
+    expect(india).not.toContain("PayPal");
+    expect(paymentMethodsFor("BR", { cardEnabled: true })).toContain("Pix");
+    expect(paymentMethodsFor("US", { cardEnabled: true })).toEqual(["Visa / Mastercard", "PayPal", "Apple Pay", "Google Pay"]);
+    expect(paymentMethodsFor("KE", { cardEnabled: false })).toEqual(["M-Pesa"]);
+  });
+  it("rounds approximate local prices so they read as estimates", () => {
+    const rates = { INR: 83.17, JPY: 151.4, NGN: 1534.2, KWD: 0.307 };
+    expect(approxFromUsd(300, "INR", rates)).toBe(25000); // $3 ≈ ₹250
+    expect(approxFromUsd(2900, "JPY", rates)).toBe(4400); // $29 ≈ ¥4,400
+    expect(approxFromUsd(300, "NGN", rates)).toBe(460000); // $3 ≈ ₦4,600
+    expect(approxFromUsd(300, "KWD", rates)).toBe(920); // $3 ≈ KWD 0.92 (two significant figures)
+    expect(approxFromUsd(300, "XYZ", rates)).toBeNull();
   });
 });

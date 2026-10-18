@@ -11,6 +11,7 @@ export const sw: Messages = {
     continue: "Endelea", tryAgain: "Jaribu tena", areYouSure: "Una uhakika?", logIn: "Ingia", logOut: "Toka",
     language: "Lugha", country: "Nchi", timezone: "Saa za eneo", currency: "Sarafu", today: "leo",
     offline: "Inaonekana huna mtandao. Angalia muunganisho wako.",
+    availableIn: "PesaFlow inapatikana pia kwa {language}.", switchLanguage: "Badilisha",
   },
   landing: {
     startFree: "Anza bure",
@@ -121,6 +122,7 @@ export const sw: Messages = {
     cardDone: "Asante! Malipo yako yanathibitishwa. Inachukua sekunde chache.",
     manage: "Simamia usajili", cancelSub: "Sitisha usajili", cardRenews: "Usajili wako wa kadi hujirudia kiotomatiki.",
     cardCanceled: "Usajili wako wa kadi umesitishwa na hautajirudia.",
+    waysToPay: "Njia za kulipa nchini {country}", approxNote: "Viwango vyenye ≈ ni vya makadirio kwa kiwango cha ubadilishaji cha leo. Wakati wa kulipa utaona bei kamili, pamoja na kodi.",
   },
   settings: {
     thisBudget: "Bajeti hii", horizon: "Siku za kukadiria", horizonHint: "Lahajedwali la awali linaangalia siku 31 mbele.",

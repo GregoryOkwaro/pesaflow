@@ -11,6 +11,7 @@ export const yo: Messages = {
     continue: "Tẹ̀síwájú", tryAgain: "Gbìyànjú lẹ́ẹ̀kan sí i", areYouSure: "Ṣé o dá ọ lójú?", logIn: "Wọlé", logOut: "Jáde",
     language: "Èdè", country: "Orílẹ̀-èdè", timezone: "Agbègbè àkókò", currency: "Owó", today: "lónìí",
     offline: "Ó dàbí pé o kò sí lórí ayélujára. Ṣàyẹ̀wò ìsopọ̀ rẹ.",
+    availableIn: "PesaFlow wà ní èdè {language} pẹ̀lú.", switchLanguage: "Yí padà",
   },
   landing: {
     startFree: "Bẹ̀rẹ̀ lọ́fẹ̀ẹ́",
@@ -121,6 +122,7 @@ export const yo: Messages = {
     cardDone: "A dúpẹ́! A ń jẹ́rìísí ìsanwó rẹ. Yóò gba ìṣẹ́jú-àáyá díẹ̀.",
     manage: "Ṣàkóso ìforúkọsílẹ̀", cancelSub: "Fagilé ìforúkọsílẹ̀", cardRenews: "Ìforúkọsílẹ̀ káàdì rẹ ń tún ara rẹ̀ ṣe.",
     cardCanceled: "A ti fagilé ìforúkọsílẹ̀ káàdì rẹ, kò sì ní tún ara rẹ̀ ṣe.",
+    waysToPay: "Ọ̀nà ìsanwó ní {country}", approxNote: "Iye owó tí ó ní ≈ jẹ́ àfojúbù ní ìwọ̀n pàṣípààrọ̀ òní. Ojú-ìwé ìsanwó yóò fi iye gangan hàn, pẹ̀lú owó-orí.",
   },
   settings: {
     thisBudget: "Ètò ìnáwó yìí", horizon: "Ọjọ́ àsọtẹ́lẹ̀", horizonHint: "Ìwé ìṣirò àkọ́kọ́ ń wo ọjọ́ 31 síwájú.",

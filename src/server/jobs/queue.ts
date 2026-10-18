@@ -11,6 +11,7 @@ export const QUEUES = {
   reconcilePayments: "reconcile-payments",
   renewalReminders: "renewal-reminders",
   housekeeping: "housekeeping",
+  refreshFx: "refresh-fx",
 } as const;
 
 const g = globalThis as unknown as { __pfBoss?: Promise<PgBoss> };

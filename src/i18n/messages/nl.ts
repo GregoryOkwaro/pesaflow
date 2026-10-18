@@ -11,6 +11,7 @@ export const nl: Messages = {
     continue: "Doorgaan", tryAgain: "Opnieuw proberen", areYouSure: "Weet je het zeker?", logIn: "Inloggen", logOut: "Uitloggen",
     language: "Taal", country: "Land", timezone: "Tijdzone", currency: "Valuta", today: "vandaag",
     offline: "Je lijkt offline te zijn. Controleer je verbinding.",
+    availableIn: "PesaFlow is ook beschikbaar in het {language}.", switchLanguage: "Wisselen",
   },
   landing: {
     startFree: "Gratis beginnen",
@@ -121,6 +122,7 @@ export const nl: Messages = {
     cardDone: "Bedankt! Je betaling wordt bevestigd. Dit duurt een paar seconden.",
     manage: "Abonnement beheren", cancelSub: "Abonnement opzeggen", cardRenews: "Je kaartabonnement wordt automatisch verlengd.",
     cardCanceled: "Je kaartabonnement is opgezegd en wordt niet verlengd.",
+    waysToPay: "Betaalmethoden in {country}", approxNote: "Bedragen met ≈ zijn een schatting tegen de wisselkoers van vandaag. Bij het afrekenen zie je de exacte prijs, inclusief btw.",
   },
   settings: {
     thisBudget: "Dit budget", horizon: "Dagen vooruitkijken", horizonHint: "De oorspronkelijke spreadsheet kijkt 31 dagen vooruit.",

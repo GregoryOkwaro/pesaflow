@@ -36,5 +36,5 @@ export class TestClient {
 }
 
 export async function resetDb() {
-  await db.execute(sql`TRUNCATE users, sessions, password_resets, budgets, accounts, items, payments, rate_limits RESTART IDENTITY CASCADE`);
+  await db.execute(sql`TRUNCATE users, sessions, password_resets, budgets, accounts, items, payments, rate_limits, fx_rates RESTART IDENTITY CASCADE`);
 }

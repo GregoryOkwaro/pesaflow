@@ -15,6 +15,13 @@
       "when": 1792305948733,
       "tag": "0001_global",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792313043918,
+      "tag": "0002_fx_rates",
+      "breakpoints": true
     }
   ]
 }

@@ -1,15 +1,20 @@
 import Link from "next/link";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { PaddlePrice } from "@/components/PaddlePrice";
 import { getT, requestCountry } from "@/i18n/server";
 import { formatMoney } from "@/lib/money";
-import { env, planList } from "@/server/env";
+import { env, paymentConfig } from "@/server/env";
+import { pricingFor } from "@/server/pricing";
 
 export const dynamic = "force-dynamic";
 
 export default async function Landing() {
   const { t, locale } = await getT();
-  const kenya = (await requestCountry()) === "KE";
-  const plans = planList();
+  const pricing = await pricingFor(await requestCountry());
+  const config = paymentConfig();
+  const kenya = pricing.country === "KE";
+  const countryName = new Intl.DisplayNames([locale, "en"], { type: "region" }).of(pricing.country) ?? pricing.country;
+  const showApprox = !kenya && pricing.plans.some((p) => p.approxLocal !== null);
   const features = [["f1Title", "f1Body"], ["f2Title", "f2Body"], ["f3Title", "f3Body"], ["f4Title", "f4Body"]] as const;
   const per = { monthly: "billing.perMonth", quarterly: "billing.perQuarter", yearly: "billing.perYear" } as const;
   return (
@@ -44,13 +49,25 @@ export default async function Landing() {
 
         <section id="pricing" className="py-16">
           <h2 className="mb-2 text-2xl font-extrabold">{t("landing.pricingTitle")}</h2>
-          <p className="muted small mb-6">{kenya ? t("landing.pricingNoteKe") : t("landing.pricingNoteIntl")}</p>
+          <p className="muted small mb-3">{kenya ? t("landing.pricingNoteKe") : t("landing.pricingNoteIntl")}</p>
+          {pricing.methods.length > 0 && (
+            <>
+              <div className="small muted font-bold">{t("billing.waysToPay", { country: countryName })}</div>
+              <div className="methods">{pricing.methods.map((m) => <span key={m} className="chip">{m}</span>)}</div>
+            </>
+          )}
           <div className="grid gap-4 md:grid-cols-3">
-            {plans.map((p) => (
+            {pricing.plans.map((p) => (
               <div key={p.key} className={`card ${p.key === "yearly" ? "ring-2 ring-[var(--brand)]" : ""}`}>
                 <div className="small muted font-bold uppercase">{t(`billing.${p.key}`)}{p.key === "yearly" ? ` · ${t("landing.bestValue")}` : ""}</div>
                 <div className="num mt-2 text-3xl font-extrabold">
-                  {kenya ? formatMoney(p.kes, "KES", locale) : formatMoney(p.usd, "USD", locale)}
+                  {kenya ? formatMoney(p.kes, "KES", locale) : (
+                    <PaddlePrice priceId={p.paddlePriceId} country={pricing.country} token={config.paddleClientToken} env={config.paddleEnv}
+                      fallback={<>
+                        {formatMoney(p.usd, "USD", locale)}
+                        {p.approxLocal !== null && <span className="approx">≈ {formatMoney(p.approxLocal, pricing.localCurrency, locale)}</span>}
+                      </>} />
+                  )}
                   <span className="small muted font-normal">{t(per[p.key])}</span>
                 </div>
                 <div className="muted small">{t("landing.daysAccess", { days: p.days })}</div>
@@ -58,6 +75,12 @@ export default async function Landing() {
               </div>
             ))}
           </div>
+          {showApprox && (
+            <p className="muted small mt-4">
+              {t("billing.approxNote", { currency: pricing.localCurrency })}{" "}
+              <a href="https://www.exchangerate-api.com" rel="noopener noreferrer" target="_blank">Rates by Exchange Rate API</a>
+            </p>
+          )}
         </section>
       </main>
 

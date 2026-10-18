@@ -11,6 +11,7 @@ export const tr: Messages = {
     continue: "Devam", tryAgain: "Tekrar dene", areYouSure: "Emin misiniz?", logIn: "Giriş yap", logOut: "Çıkış yap",
     language: "Dil", country: "Ülke", timezone: "Saat dilimi", currency: "Para birimi", today: "bugün",
     offline: "Çevrimdışı görünüyorsunuz. Bağlantınızı kontrol edin.",
+    availableIn: "PesaFlow {language} dilinde de kullanılabilir.", switchLanguage: "Değiştir",
   },
   landing: {
     startFree: "Ücretsiz başla",
@@ -121,6 +122,7 @@ export const tr: Messages = {
     cardDone: "Teşekkürler! Ödemeniz onaylanıyor. Bu birkaç saniye sürer.",
     manage: "Aboneliği yönet", cancelSub: "Aboneliği iptal et", cardRenews: "Kart aboneliğiniz otomatik olarak yenilenir.",
     cardCanceled: "Kart aboneliğiniz iptal edildi ve yenilenmeyecek.",
+    waysToPay: "{country} için ödeme yöntemleri", approxNote: "≈ işaretli tutarlar bugünkü kura göre yaklaşıktır. Ödeme sayfası vergiler dahil kesin fiyatı gösterir.",
   },
   settings: {
     thisBudget: "Bu bütçe", horizon: "Tahmin günü", horizonHint: "Orijinal tablo 31 gün ilerisini öngörür.",

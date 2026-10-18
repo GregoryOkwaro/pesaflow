@@ -6,7 +6,7 @@
  */
 import { sql } from "drizzle-orm";
 import {
-  bigint, boolean, date, index, integer, pgTable, text, timestamp, uniqueIndex, uuid, type AnyPgColumn,
+  bigint, boolean, date, doublePrecision, index, integer, pgTable, text, timestamp, uniqueIndex, uuid, type AnyPgColumn,
 } from "drizzle-orm/pg-core";
 
 const id = () => uuid("id").primaryKey().default(sql`uuidv7()`);
@@ -108,6 +108,13 @@ export const payments = pgTable("payments", {
   uniqueIndex("payments_receipt_key").on(t.provider, t.receipt),
   index("payments_pending_idx").on(t.status, t.createdAt),
 ]);
+
+/** Daily exchange rates (units of currency per 1 USD), only for showing approximate local prices. */
+export const fxRates = pgTable("fx_rates", {
+  currency: text("currency").primaryKey(),
+  perUsd: doublePrecision("per_usd").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
 
 /** Fixed-window rate limiting shared by every app instance. */
 export const rateLimits = pgTable("rate_limits", {

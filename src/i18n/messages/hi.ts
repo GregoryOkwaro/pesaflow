@@ -11,6 +11,7 @@ export const hi: Messages = {
     continue: "जारी रखें", tryAgain: "फिर से कोशिश करें", areYouSure: "क्या आप निश्चित हैं?", logIn: "लॉग इन करें", logOut: "लॉग आउट करें",
     language: "भाषा", country: "देश", timezone: "समय क्षेत्र", currency: "मुद्रा", today: "आज",
     offline: "लगता है आप ऑफ़लाइन हैं। अपना कनेक्शन जाँचें।",
+    availableIn: "PesaFlow {language} में भी उपलब्ध है।", switchLanguage: "बदलें",
   },
   landing: {
     startFree: "मुफ़्त शुरू करें",
@@ -121,6 +122,7 @@ export const hi: Messages = {
     cardDone: "धन्यवाद! आपके भुगतान की पुष्टि हो रही है। इसमें कुछ सेकंड लगते हैं।",
     manage: "सदस्यता प्रबंधित करें", cancelSub: "सदस्यता रद्द करें", cardRenews: "आपकी कार्ड सदस्यता अपने-आप नवीनीकृत होती है।",
     cardCanceled: "आपकी कार्ड सदस्यता रद्द हो गई है और नवीनीकृत नहीं होगी।",
+    waysToPay: "{country} में भुगतान के तरीके", approxNote: "≈ वाली राशियाँ आज की विनिमय दर पर अनुमानित हैं। चेकआउट पर टैक्स सहित सटीक कीमत दिखती है।",
   },
   settings: {
     thisBudget: "यह बजट", horizon: "अनुमान के दिन", horizonHint: "मूल स्प्रेडशीट 31 दिन आगे तक देखती है।",

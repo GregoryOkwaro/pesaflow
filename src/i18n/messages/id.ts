@@ -11,6 +11,7 @@ export const id: Messages = {
     continue: "Lanjut", tryAgain: "Coba lagi", areYouSure: "Anda yakin?", logIn: "Masuk", logOut: "Keluar",
     language: "Bahasa", country: "Negara", timezone: "Zona waktu", currency: "Mata uang", today: "hari ini",
     offline: "Sepertinya Anda sedang offline. Periksa koneksi Anda.",
+    availableIn: "PesaFlow juga tersedia dalam {language}.", switchLanguage: "Ganti",
   },
   landing: {
     startFree: "Mulai gratis",
@@ -121,6 +122,7 @@ export const id: Messages = {
     cardDone: "Terima kasih! Pembayaran Anda sedang dikonfirmasi. Ini butuh beberapa detik.",
     manage: "Kelola langganan", cancelSub: "Batalkan langganan", cardRenews: "Langganan kartu Anda diperpanjang otomatis.",
     cardCanceled: "Langganan kartu Anda dibatalkan dan tidak akan diperpanjang.",
+    waysToPay: "Cara bayar di {country}", approxNote: "Jumlah bertanda ≈ adalah perkiraan menurut kurs hari ini. Halaman pembayaran menampilkan harga pasti, termasuk pajak.",
   },
   settings: {
     thisBudget: "Anggaran ini", horizon: "Hari proyeksi", horizonHint: "Spreadsheet asli memproyeksikan 31 hari ke depan.",

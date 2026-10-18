@@ -8,7 +8,7 @@ export async function requestLocale(userLocale?: string | null): Promise<Locale>
   if (isLocale(userLocale)) return userLocale;
   const fromCookie = (await cookies()).get(LOCALE_COOKIE)?.value;
   if (isLocale(fromCookie)) return fromCookie;
-  return negotiateLocale((await headers()).get("accept-language"));
+  return negotiateLocale((await headers()).get("accept-language"), await requestCountry());
 }
 
 export async function getT(userLocale?: string | null) {

@@ -11,6 +11,7 @@ export const ar: Messages = {
     continue: "متابعة", tryAgain: "حاول مجددًا", areYouSure: "هل أنت متأكد؟", logIn: "تسجيل الدخول", logOut: "تسجيل الخروج",
     language: "اللغة", country: "البلد", timezone: "المنطقة الزمنية", currency: "العملة", today: "اليوم",
     offline: "يبدو أنك غير متصل بالإنترنت. تحقّق من اتصالك.",
+    availableIn: "يتوفر PesaFlow أيضًا باللغة {language}.", switchLanguage: "تغيير",
   },
   landing: {
     startFree: "ابدأ مجانًا",
@@ -121,6 +122,7 @@ export const ar: Messages = {
     cardDone: "شكرًا! جارٍ تأكيد دفعتك. يستغرق ذلك بضع ثوانٍ.",
     manage: "إدارة الاشتراك", cancelSub: "إلغاء الاشتراك", cardRenews: "يتجدّد اشتراكك بالبطاقة تلقائيًا.",
     cardCanceled: "أُلغي اشتراكك بالبطاقة ولن يتجدّد.",
+    waysToPay: "طرق الدفع في {country}", approxNote: "المبالغ المميزة بـ ≈ تقريبية حسب سعر الصرف اليوم. تعرض صفحة الدفع السعر الدقيق شاملًا أي ضريبة.",
   },
   settings: {
     thisBudget: "هذه الميزانية", horizon: "أيام التوقّع", horizonHint: "جدول البيانات الأصلي يتوقّع 31 يومًا.",

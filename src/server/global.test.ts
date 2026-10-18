@@ -17,6 +17,8 @@ import { db, schema } from "@/server/db";
 import { outbox } from "@/server/notify/channels";
 import { signPaddlePayload } from "@/server/payments/paddle";
 import { sendRenewalReminders } from "@/server/services/reminders";
+import { refreshRates } from "@/server/services/fx";
+import { pricingFor } from "@/server/pricing";
 import { resetDb, TestClient } from "@/test/client";
 
 const SECRET = "pdl_ntfset_test_secret";
@@ -205,5 +207,31 @@ describe("renewal reminders across time zones", () => {
     const msg = outbox.at(-1)!;
     expect(msg.email).toBe("lagos@example.com");
     expect(msg.subject).toMatch(/^Votre essai gratuit PesaFlow se termine/);
+  });
+});
+
+describe("local prices", () => {
+  const fakeFx = (async () => new Response(JSON.stringify({ result: "success", rates: { USD: 1, INR: 83.2, KES: 129.5, EUR: 0.92 } }))) as unknown as typeof fetch;
+
+  it("stores daily rates and shows ≈ local prices next to USD", async () => {
+    expect(await refreshRates(fakeFx)).toBe(4);
+    const india = await pricingFor("IN");
+    expect(india.localCurrency).toBe("INR");
+    expect(india.chargedInLocal).toBe(true); // Paddle can charge INR directly
+    expect(india.plans.find((p) => p.key === "monthly")!.approxLocal).toBe(25000); // ≈ ₹250
+    expect(india.methods).toContain("UPI");
+    const us = await pricingFor("US");
+    expect(us.plans[0]!.approxLocal).toBeNull();
+    const unknown = await pricingFor("ZZ");
+    expect(unknown.country).toBe("US");
+  });
+
+  it("logged-in users get pricing for their own country", async () => {
+    await refreshRates(fakeFx);
+    const c = await signup("ke@example.com", { country: "KE", timezone: "Africa/Nairobi" });
+    const r = await c.call(me, "GET");
+    expect(r.data.pricing.country).toBe("KE");
+    expect(r.data.pricing.methods[0]).toBe("M-Pesa");
+    expect(r.data.pricing.plans[0].approxLocal).toBe(39000); // card price $3 ≈ KES 390
   });
 });

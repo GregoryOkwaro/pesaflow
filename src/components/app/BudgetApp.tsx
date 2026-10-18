@@ -2,10 +2,11 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useT } from "@/i18n/client";
 import { api, onApiError } from "@/lib/api";
 import { AccountDialog, BillingDialog, ItemDialog, NewBudgetDialog } from "./Dialogs";
 import { Settings } from "./Settings";
-import type { Account, BudgetPayload, BudgetSummary, Item, Me, Plan, Tab } from "./types";
+import type { Account, BudgetPayload, BudgetSummary, Item, Me, PaymentConfig, Plan, Tab } from "./types";
 import { Confirm } from "./ui";
 import { Daily, Items, Overview, SubscriptionBanner } from "./Views";
 
@@ -17,9 +18,10 @@ type Dialog =
   | { kind: "confirm"; message: string; okLabel: string; onOk: () => void }
   | null;
 
-const TABS: [Tab, string, string][] = [["overview", "▦", "Overview"], ["items", "☰", "Items"], ["daily", "▤", "Daily"], ["settings", "⚙", "Settings"]];
+const TAB_ICONS: Record<Tab, string> = { overview: "▦", items: "☰", daily: "▤", settings: "⚙" };
 
-export function BudgetApp(props: { me: Me; plans: Plan[]; mpesaEnv: string; budgets: BudgetSummary[]; initial: BudgetPayload }) {
+export function BudgetApp(props: { me: Me; plans: Plan[]; payments: PaymentConfig; budgets: BudgetSummary[]; initial: BudgetPayload }) {
+  const { t, tp, locale } = useT();
   const router = useRouter();
   const search = useSearchParams();
   const [me, setMe] = useState(props.me);
@@ -28,6 +30,10 @@ export function BudgetApp(props: { me: Me; plans: Plan[]; mpesaEnv: string; budg
   const [tab, setTab] = useState<Tab>((search.get("tab") as Tab) || "overview");
   const [dialog, setDialog] = useState<Dialog>(null);
   const [toastMsg, setToastMsg] = useState("");
+  // Settings lists (countries, time zones, currencies) come from the browser's Intl data,
+  // which can differ from the server's, so that tab renders only after hydration.
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const toast = useCallback((m: string) => {
@@ -37,30 +43,35 @@ export function BudgetApp(props: { me: Me; plans: Plan[]; mpesaEnv: string; budg
   }, []);
 
   useEffect(() => {
-    if (search.get("reset") === "1") toast("Password changed. You're logged in.");
+    if (search.get("reset") === "1") toast(t("settings.passwordChanged"));
     return onApiError((status, body) => {
       if (status === 401) router.replace("/login");
       if (status === 402) setDialog({ kind: "billing", reason: String(body.error ?? "") });
     });
-  }, [router, search, toast]);
+  }, [router, search, toast, t]);
 
-  const switchTab = (t: Tab) => {
-    setTab(t);
-    window.history.replaceState(null, "", t === "overview" ? "/app" : `/app?tab=${t}`);
+  // Re-sync after router.refresh() (e.g. a language change re-renders the page on the server).
+  useEffect(() => setData(props.initial), [props.initial]);
+
+  const switchTab = (next: Tab) => {
+    setTab(next);
+    window.history.replaceState(null, "", next === "overview" ? "/app" : `/app?tab=${next}`);
     window.scrollTo({ top: 0 });
   };
+
+  const rememberBudget = (id: string) => { document.cookie = `pf_budget=${id}; path=/; max-age=31536000; samesite=lax`; };
 
   const refreshBudgets = async (selectId?: string) => {
     const { budgets: list } = await api<{ budgets: BudgetSummary[] }>("GET", "/api/budgets");
     setBudgets(list);
     const id = selectId && list.some((b) => b.id === selectId) ? selectId : list[0]!.id;
-    if (id !== data.budget.id || selectId) setData(await api<BudgetPayload>("GET", `/api/budgets/${id}`));
-    document.cookie = `pf_budget=${id}; path=/; max-age=31536000; samesite=lax`;
+    setData(await api<BudgetPayload>("GET", `/api/budgets/${id}`));
+    rememberBudget(id);
   };
 
   const loadBudget = async (id: string) => {
     setData(await api<BudgetPayload>("GET", `/api/budgets/${id}`));
-    document.cookie = `pf_budget=${id}; path=/; max-age=31536000; samesite=lax`;
+    rememberBudget(id);
   };
 
   const saved = (d: BudgetPayload, msg: string) => { setData(d); setDialog(null); toast(msg); };
@@ -77,16 +88,16 @@ export function BudgetApp(props: { me: Me; plans: Plan[]; mpesaEnv: string; budg
   const actions = {
     openItem: (item?: Item) => setDialog({ kind: "item", item }),
     openAccount: (account?: Account) => setDialog({ kind: "account", account }),
-    toggleDone: (i: Item) => mutate("PUT", `/api/items/${i.id}`, { done: !i.done }, i.done ? "Marked as not paid" : "Marked as paid"),
+    toggleDone: (i: Item) => mutate("PUT", `/api/items/${i.id}`, { done: !i.done }, i.done ? t("items.markedUnpaid") : t("items.markedPaid")),
     openBilling: (reason?: string) => setDialog({ kind: "billing", reason }),
-    goto: (t: "daily") => switchTab(t),
+    goto: (next: "daily") => switchTab(next),
   };
 
   const s = me.subscription;
   const badge = !s.active
-    ? <button className="badge bad" onClick={() => actions.openBilling()}>Expired · Renew</button>
+    ? <button className="badge bad" onClick={() => actions.openBilling()}>{t("sub.expiredBadge")}</button>
     : <button className={`badge ${s.daysLeft <= (s.onTrial ? 3 : 5) ? "warn" : ""}`} onClick={() => actions.openBilling()}>
-        {s.onTrial ? `Trial · ${s.daysLeft}d left` : `Active · ${s.daysLeft}d`}</button>;
+        {s.onTrial ? tp("sub.trialBadge", s.daysLeft) : tp("sub.activeBadge", s.daysLeft)}</button>;
 
   const nextMonth = new Date(); nextMonth.setMonth(nextMonth.getMonth() + 1);
 
@@ -94,16 +105,16 @@ export function BudgetApp(props: { me: Me; plans: Plan[]; mpesaEnv: string; budg
     <>
       <header className="topbar">
         <div className="brand"><img src="/icon.svg" alt="" /><span>PesaFlow</span></div>
-        <select className="budget-select" aria-label="Budget" value={data.budget.id} onChange={(e) => loadBudget(e.target.value)}>
-          {budgets.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+        <select className="budget-select" aria-label={t("budget.name")} value={data.budget.id} onChange={(e) => loadBudget(e.target.value)}>
+          {budgets.map((b) => <option key={b.id} value={b.id}>{b.name} · {b.currency}</option>)}
         </select>
         <div className="spacer" />
         {badge}
       </header>
       <nav className="nav" aria-label="Sections">
-        {TABS.map(([k, ico, label]) => (
+        {(Object.keys(TAB_ICONS) as Tab[]).map((k) => (
           <button key={k} type="button" className={tab === k ? "on" : ""} onClick={() => switchTab(k)}>
-            <span className="ico" aria-hidden="true">{ico}</span>{label}
+            <span className="ico" aria-hidden="true">{TAB_ICONS[k]}</span>{t(`nav.${k}`)}
           </button>
         ))}
       </nav>
@@ -112,16 +123,18 @@ export function BudgetApp(props: { me: Me; plans: Plan[]; mpesaEnv: string; budg
         {tab === "overview" && <Overview data={data} a={actions} />}
         {tab === "items" && <Items data={data} a={actions} />}
         {tab === "daily" && <Daily data={data} />}
-        {tab === "settings" && (
+        {tab === "settings" && hydrated && (
           <Settings
-            data={data} me={me} budgetsCount={budgets.length} plans={props.plans} toast={toast} onMe={setMe}
-            onBudgetSaved={(d) => { setData(d); setBudgets((bs) => bs.map((b) => (b.id === d.budget.id ? { ...b, name: d.budget.name } : b))); }}
+            key={locale}
+            data={data} me={me} budgetsCount={budgets.length} toast={toast} onMe={setMe}
+            onBudgetSaved={(d) => { setData(d); setBudgets((bs) => bs.map((b) => (b.id === d.budget.id ? { ...b, name: d.budget.name, currency: d.budget.currency } : b))); }}
             onCopy={() => setDialog({ kind: "newBudget", copy: true })}
             onNew={() => setDialog({ kind: "newBudget", copy: false })}
             onBilling={() => actions.openBilling()}
+            onLocaleChanged={() => router.refresh()}
             onDelete={() => setDialog({
-              kind: "confirm", okLabel: "Delete", message: `Delete “${data.budget.name}” and all its items? This can't be undone.`,
-              onOk: async () => { await api("DELETE", `/api/budgets/${data.budget.id}`).catch((e: Error) => toast(e.message)); await refreshBudgets(); toast("Budget deleted"); },
+              kind: "confirm", okLabel: t("common.delete"), message: t("budget.confirmDelete", { name: data.budget.name }),
+              onOk: async () => { await api("DELETE", `/api/budgets/${data.budget.id}`).catch((e: Error) => toast(e.message)); await refreshBudgets(); toast(t("budget.deleted")); },
             })}
             onLogout={async () => { await api("POST", "/api/auth/logout").catch(() => {}); router.replace("/login"); }}
           />
@@ -130,21 +143,22 @@ export function BudgetApp(props: { me: Me; plans: Plan[]; mpesaEnv: string; budg
 
       {dialog?.kind === "item" && (
         <ItemDialog data={data} item={dialog.item} onSaved={saved} onClose={() => setDialog(null)}
-          onDelete={(i) => setDialog({ kind: "confirm", okLabel: "Delete", message: `Delete “${i.name}”?`, onOk: () => mutate("DELETE", `/api/items/${i.id}`, undefined, "Item deleted") })} />
+          onDelete={(i) => setDialog({ kind: "confirm", okLabel: t("common.delete"), message: t("itemDialog.confirmDelete", { name: i.name }), onOk: () => mutate("DELETE", `/api/items/${i.id}`, undefined, t("items.deleted")) })} />
       )}
       {dialog?.kind === "account" && (
-        <AccountDialog budgetId={data.budget.id} account={dialog.account} onSaved={saved} onClose={() => setDialog(null)}
-          onDelete={(a) => setDialog({ kind: "confirm", okLabel: "Delete", message: `Delete account “${a.name}”? Items using it are kept.`, onOk: () => mutate("DELETE", `/api/accounts/${a.id}`, undefined, "Account deleted") })} />
+        <AccountDialog budgetId={data.budget.id} currency={data.budget.currency} account={dialog.account} onSaved={saved} onClose={() => setDialog(null)}
+          onDelete={(a) => setDialog({ kind: "confirm", okLabel: t("common.delete"), message: t("accountDialog.confirmDelete", { name: a.name }), onOk: () => mutate("DELETE", `/api/accounts/${a.id}`, undefined, t("accountDialog.deleted")) })} />
       )}
       {dialog?.kind === "billing" && (
-        <BillingDialog me={me} plans={props.plans} mpesaEnv={props.mpesaEnv} reason={dialog.reason} onUser={setMe} onClose={() => setDialog(null)} />
+        <BillingDialog me={me} plans={props.plans} config={props.payments} reason={dialog.reason} onUser={setMe} onClose={() => setDialog(null)} />
       )}
       {dialog?.kind === "newBudget" && (
         <NewBudgetDialog
           copyFrom={dialog.copy ? data.budget.id : undefined}
-          suggested={dialog.copy ? `${data.budget.name} (copy)` : nextMonth.toLocaleDateString("en-GB", { month: "long", year: "numeric" })}
+          defaultCurrency={me.defaultCurrency}
+          suggested={dialog.copy ? t("budget.copySuffix", { name: data.budget.name }) : nextMonth.toLocaleDateString(locale === "en" ? "en-GB" : locale, { month: "long", year: "numeric" })}
           onClose={() => setDialog(null)}
-          onCreated={async (d) => { setDialog(null); await refreshBudgets(d.budget.id); switchTab("items"); toast("Budget created"); }}
+          onCreated={async (d) => { setDialog(null); await refreshBudgets(d.budget.id); switchTab("items"); toast(t("budget.created")); }}
         />
       )}
       {dialog?.kind === "confirm" && <Confirm message={dialog.message} okLabel={dialog.okLabel} onOk={dialog.onOk} onClose={() => setDialog(null)} />}

@@ -24,10 +24,10 @@ await b.work(QUEUES.renewalReminders, async () => {
 await b.work(QUEUES.housekeeping, async () => housekeeping());
 
 await b.schedule(QUEUES.reconcilePayments, "* * * * *", null, { tz });
-await b.schedule(QUEUES.renewalReminders, "0 9 * * *", null, { tz }); // 9am Nairobi
+await b.schedule(QUEUES.renewalReminders, "0 * * * *", null, { tz }); // hourly: each user is reminded at 9am their time
 await b.schedule(QUEUES.housekeeping, "30 3 * * *", null, { tz });
 
-console.log("[worker] running: messages, payment reconciliation (every minute), reminders (09:00 EAT), housekeeping");
+console.log("[worker] running: messages, payment reconciliation (every minute), reminders (9am in each user's time zone), housekeeping");
 
 const stop = async () => {
   console.log("[worker] stopping…");

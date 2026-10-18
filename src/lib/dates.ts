@@ -29,15 +29,36 @@ export function diffDays(a: ISODate, b: ISODate): number {
   return toDayNumber(a) - toDayNumber(b);
 }
 
-/** Today's date in Kenya (UTC+3, no DST). */
+/** Today's calendar date in an IANA time zone (handles DST). Falls back to UTC for unknown zones. */
+export function todayIn(timeZone: string, now: Date = new Date()): ISODate {
+  try {
+    // en-CA formats as YYYY-MM-DD.
+    return new Intl.DateTimeFormat("en-CA", { timeZone, year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
+  } catch {
+    return now.toISOString().slice(0, 10);
+  }
+}
+
+/** Kept for Kenya-specific code paths (Daraja timestamps). */
 export function todayInNairobi(now: Date = new Date()): ISODate {
-  return new Date(now.getTime() + 3 * 3_600_000).toISOString().slice(0, 10);
+  return todayIn("Africa/Nairobi", now);
+}
+
+export function isTimeZone(tz: unknown): tz is string {
+  if (typeof tz !== "string" || tz.length > 64) return false;
+  try {
+    new Intl.DateTimeFormat("en", { timeZone: tz });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function weekday(iso: ISODate): number {
   return new Date(`${iso}T00:00:00Z`).getUTCDay();
 }
 
-export function formatDate(iso: ISODate, opts: Intl.DateTimeFormatOptions = { weekday: "short", day: "numeric", month: "short" }): string {
-  return new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-GB", { ...opts, timeZone: "UTC" });
+/** Formats a calendar date in the given UI locale ("en" renders day-first, as in Kenya and the UK). */
+export function formatDate(iso: ISODate, opts: Intl.DateTimeFormatOptions = { weekday: "short", day: "numeric", month: "short" }, locale = "en"): string {
+  return new Date(`${iso}T00:00:00Z`).toLocaleDateString(locale === "en" ? "en-GB" : locale, { ...opts, timeZone: "UTC" });
 }

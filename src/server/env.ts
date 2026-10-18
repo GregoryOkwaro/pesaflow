@@ -28,9 +28,24 @@ const schema = z.object({
   MAX_BUDGETS_PER_USER: int(10),
   MAX_ITEMS_PER_BUDGET: int(200),
 
+  // M-Pesa (Kenya) prices in whole KES.
   PLAN_MONTHLY_KES: int(299),
   PLAN_QUARTERLY_KES: int(799),
   PLAN_YEARLY_KES: int(2999),
+  // Display prices for everyone else (marketing + plan picker). The amount actually charged,
+  // including local-currency and tax, comes from the Paddle price (set PPP overrides there).
+  PLAN_MONTHLY_USD: str("3"),
+  PLAN_QUARTERLY_USD: str("8"),
+  PLAN_YEARLY_USD: str("29"),
+
+  // Card / PayPal / local methods worldwide via Paddle (merchant of record).
+  PADDLE_ENV: oneOf(["mock", "sandbox", "production"], "mock"),
+  PADDLE_CLIENT_TOKEN: optStr(), // public, for Paddle.js
+  PADDLE_API_KEY: optStr(), // server-side, to cancel subscriptions on account deletion
+  PADDLE_WEBHOOK_SECRET: optStr(), // notification destination's secret key
+  PADDLE_PRICE_MONTHLY: optStr(),
+  PADDLE_PRICE_QUARTERLY: optStr(),
+  PADDLE_PRICE_YEARLY: optStr(),
 
   // Payments: mock (local, no money) | sandbox | production
   MPESA_ENV: oneOf(["mock", "sandbox", "production"], "mock"),
@@ -51,6 +66,8 @@ const schema = z.object({
   AT_USERNAME: optStr(), // "sandbox" for Africa's Talking sandbox
   AT_API_KEY: optStr(),
   AT_SENDER_ID: optStr(),
+  // Countries Africa's Talking delivers SMS to; elsewhere messages go by email only.
+  AT_SMS_COUNTRIES: str("KE,UG,TZ,RW,MW,NG,ZM,ET,CI,CM,SN,GH,ZA"),
 
   // Cloudflare Turnstile (bot check on sign-up / reset). Optional.
   TURNSTILE_SITE_KEY: optStr(),
@@ -76,20 +93,52 @@ export function env(): Env {
     if (e.MPESA_ENV !== "mock" && e.MPESA_CALLBACK_SECRET.length < 20) {
       throw new Error("MPESA_CALLBACK_SECRET must be a long random string when MPESA_ENV is sandbox/production.");
     }
+    if (e.PADDLE_ENV !== "mock" && (!e.PADDLE_WEBHOOK_SECRET || !e.PADDLE_CLIENT_TOKEN)) {
+      throw new Error("PADDLE_CLIENT_TOKEN and PADDLE_WEBHOOK_SECRET are required when PADDLE_ENV is sandbox/production.");
+    }
     cached = e;
   }
   return cached;
 }
 
-export const PLANS = {
-  monthly: { label: "Monthly", days: 30, amount: () => env().PLAN_MONTHLY_KES },
-  quarterly: { label: "3 months", days: 91, amount: () => env().PLAN_QUARTERLY_KES },
-  yearly: { label: "Yearly", days: 365, amount: () => env().PLAN_YEARLY_KES },
-} as const;
-export type PlanKey = keyof typeof PLANS;
+export const PLAN_KEYS = ["monthly", "quarterly", "yearly"] as const;
+export type PlanKey = (typeof PLAN_KEYS)[number];
+export const PLAN_DAYS: Record<PlanKey, number> = { monthly: 30, quarterly: 91, yearly: 365 };
+export const isPlan = (p: unknown): p is PlanKey => typeof p === "string" && (PLAN_KEYS as readonly string[]).includes(p);
 
+/** M-Pesa price in KES minor units (cents). */
+export function mpesaPrice(plan: PlanKey): number {
+  const e = env();
+  return { monthly: e.PLAN_MONTHLY_KES, quarterly: e.PLAN_QUARTERLY_KES, yearly: e.PLAN_YEARLY_KES }[plan] * 100;
+}
+
+export function paddlePriceId(plan: PlanKey): string | undefined {
+  const e = env();
+  return { monthly: e.PADDLE_PRICE_MONTHLY, quarterly: e.PADDLE_PRICE_QUARTERLY, yearly: e.PADDLE_PRICE_YEARLY }[plan];
+}
+
+/** Plan picker data for the browser. */
 export function planList() {
-  return (Object.keys(PLANS) as PlanKey[]).map((key) => ({ key, label: PLANS[key].label, days: PLANS[key].days, amount: PLANS[key].amount() }));
+  const e = env();
+  const usd = { monthly: e.PLAN_MONTHLY_USD, quarterly: e.PLAN_QUARTERLY_USD, yearly: e.PLAN_YEARLY_USD };
+  return PLAN_KEYS.map((key) => ({
+    key,
+    days: PLAN_DAYS[key],
+    kes: mpesaPrice(key), // minor units
+    usd: Math.round(Number(usd[key]) * 100), // minor units, display only
+    paddlePriceId: paddlePriceId(key) ?? null,
+  }));
+}
+
+/** Public client config for checkout. */
+export function paymentConfig() {
+  const e = env();
+  return {
+    mpesaEnv: e.MPESA_ENV,
+    paddleEnv: e.PADDLE_ENV,
+    paddleClientToken: e.PADDLE_CLIENT_TOKEN ?? null,
+    cardEnabled: e.PADDLE_ENV === "mock" || PLAN_KEYS.every((k) => !!paddlePriceId(k)),
+  };
 }
 
 export function isAdminEmail(email: string): boolean {

@@ -10,10 +10,10 @@
  * - Occurrences      = effective date, then every N days until END DATE (rows 2–33).
  * - Each day         = sum of that day's occurrences (AW), running balance (AX).
  *
- * All money is integer cents.
+ * All money is integer minor units (cents) of the budget currency.
  */
 import { addDays, diffDays, type ISODate } from "@/lib/dates";
-import type { Cents } from "@/lib/money";
+import type { Minor as Cents } from "@/lib/money";
 
 export interface EngineAccount {
   id: string;

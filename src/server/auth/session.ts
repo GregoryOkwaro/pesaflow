@@ -48,7 +48,7 @@ export async function currentUser(): Promise<User | null> {
 
 export async function requireUser(): Promise<User> {
   const user = await currentUser();
-  if (!user) throw new ApiError(401, "Please log in.");
+  if (!user) throw new ApiError(401, "errors.loginRequired");
   return user;
 }
 
@@ -56,7 +56,7 @@ export async function requireUser(): Promise<User> {
 export async function requireActive(): Promise<User> {
   const user = await requireUser();
   if (!subscriptionStatus(user).active) {
-    throw new ApiError(402, "Your subscription has expired. Renew with M-Pesa to keep editing.", { code: "subscription_expired" });
+    throw new ApiError(402, "errors.subscriptionExpired", {}, { reason: "subscription_expired" });
   }
   return user;
 }

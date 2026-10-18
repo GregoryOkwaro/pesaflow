@@ -241,3 +241,5 @@ table.daygrid tr.detail td { text-align: left; background: var(--surface-2); whi
 .tabs a.tab.on { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
 @media (max-width: 899px) { .wide-only { display: none; } }
 .toolbar input[type=search] { flex: 1 1 200px; }
+.lang-select { min-height: 38px; padding: 6px 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); max-width: 140px; }
+.plan .price .small { margin-left: 2px; }

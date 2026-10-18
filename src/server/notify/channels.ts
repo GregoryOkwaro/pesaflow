@@ -1,11 +1,12 @@
 /** Delivery channels: ZeptoMail (transactional email) and Africa's Talking (SMS). */
 import { env } from "../env";
+import { phoneCountry } from "../payments/phone";
 
 export interface Message {
   kind: "reset_code" | "renewal_reminder" | "payment_receipt";
   email?: string;
   name?: string;
-  phone?: string | null; // 2547XXXXXXXX
+  phone?: string | null; // E.164 digits, e.g. 254712345678
   subject: string;
   text: string;
 }
@@ -53,6 +54,12 @@ export async function sendSms(phone: string, text: string): Promise<void> {
   if (!res.ok || status !== "Success") throw new Error(`SMS not accepted (HTTP ${res.status}): ${JSON.stringify(data).slice(0, 300)}`);
 }
 
+/** Africa's Talking covers a set of African countries; everyone else gets email only. */
+export function smsSupported(phone: string): boolean {
+  const country = phoneCountry(phone);
+  return !!country && env().AT_SMS_COUNTRIES.split(",").map((c) => c.trim().toUpperCase()).includes(country);
+}
+
 /** Sends on every configured channel. Throws if every attempted channel failed (so the job retries). */
 export async function deliver(msg: Message): Promise<void> {
   const e = env();
@@ -64,7 +71,7 @@ export async function deliver(msg: Message): Promise<void> {
   }
   const attempts: Promise<void>[] = [];
   if (msg.email && e.ZEPTOMAIL_TOKEN) attempts.push(sendEmail(msg.email, msg.name, msg.subject, msg.text));
-  if (msg.phone && e.AT_USERNAME && e.AT_API_KEY) attempts.push(sendSms(msg.phone, msg.text));
+  if (msg.phone && e.AT_USERNAME && e.AT_API_KEY && smsSupported(msg.phone)) attempts.push(sendSms(msg.phone, msg.text));
   if (!attempts.length) throw new Error("No delivery channel configured (set ZEPTOMAIL_TOKEN and/or AT_USERNAME + AT_API_KEY).");
   const results = await Promise.allSettled(attempts);
   results.forEach((r) => r.status === "rejected" && console.error("[notify]", r.reason));

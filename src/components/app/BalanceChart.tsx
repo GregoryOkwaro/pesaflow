@@ -2,12 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { Projection } from "@/engine/engine";
-import { formatDate } from "@/lib/dates";
-import { formatKes } from "@/lib/money";
-import { tone } from "./ui";
+import { useT } from "@/i18n/client";
+import { tone, useFmt } from "./ui";
 
 /** Step chart of the projected balance (the balance holds all day, then jumps). Red below zero. */
-export function BalanceChart({ projection: p }: { projection: Projection }) {
+export function BalanceChart({ projection: p, currency }: { projection: Projection; currency: string }) {
+  const { t, tp } = useT();
+  const f = useFmt(currency);
   const box = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(600);
   const [hover, setHover] = useState<number | null>(null);
@@ -44,7 +45,7 @@ export function BalanceChart({ projection: p }: { projection: Projection }) {
 
   return (
     <div ref={box}>
-      <svg className="chart" viewBox={`0 0 ${W} ${H}`} width={W} height={H} role="img" aria-label="Projected balance chart"
+      <svg className="chart" viewBox={`0 0 ${W} ${H}`} width={W} height={H} role="img" aria-label={tp("overview.chartTitle", p.horizon)}
         onPointerMove={(e) => pick(e.clientX, e.currentTarget.getBoundingClientRect())}
         onPointerDown={(e) => pick(e.clientX, e.currentTarget.getBoundingClientRect())}>
         <clipPath id="pf-above"><rect x="0" y="0" width={W} height={Math.max(0, zeroY)} /></clipPath>
@@ -56,16 +57,18 @@ export function BalanceChart({ projection: p }: { projection: Projection }) {
         <circle className="dot" cx={x(lowIdx)} cy={y(vals[lowIdx]!)} r="4" />
         {ticks.map((i) => (
           <text key={i} x={x(i)} y={H - 6} textAnchor={i === 0 ? "start" : i === n - 1 ? "end" : "middle"}>
-            {formatDate(p.days[i]!.date, { day: "numeric", month: "short" })}
+            {f.date(p.days[i]!.date, { day: "numeric", month: "short" })}
           </text>
         ))}
         {hover !== null && <line className="hover-line" x1={x(hover)} x2={x(hover)} y1={padT} y2={H - padB} />}
       </svg>
       <div className="chart-tip num">
         {day ? (
-          <><b>{formatDate(day.date)}</b> · balance <span className={tone(day.balance)}>{formatKes(day.balance)}</span> · net{" "}
-            <span className={tone(day.net)}>{formatKes(day.net, { sign: true })}</span></>
-        ) : "Tap or hover the chart to see a day."}
+          <>
+            <b>{f.date(day.date)}</b> · <span className={tone(day.balance)}>{f.money(day.balance)}</span> ·{" "}
+            <span className={tone(day.net)}>{f.money(day.net, true)}</span>
+          </>
+        ) : t("overview.chartHint")}
       </div>
     </div>
   );

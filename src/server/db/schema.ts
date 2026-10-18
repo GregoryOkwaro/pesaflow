@@ -1,7 +1,8 @@
 /**
  * PostgreSQL 18 schema. IDs use Postgres 18's built-in uuidv7(): time-ordered
- * (index friendly) and safe to expose in URLs. Money is bigint cents; M-Pesa
- * payment amounts are whole KES. Calendar dates are `date` strings (YYYY-MM-DD).
+ * (index friendly) and safe to expose in URLs. Money is bigint *minor units* of
+ * the row's currency (cents for KES/USD, whole yen for JPY, fils for KWD).
+ * Calendar dates are `date` strings (YYYY-MM-DD) in the user's own time zone.
  */
 import { sql } from "drizzle-orm";
 import {
@@ -15,14 +16,23 @@ export const users = pgTable("users", {
   id: id(),
   email: text("email").notNull(), // stored lower-case
   name: text("name").notNull(),
-  phone: text("phone"), // 2547XXXXXXXX
+  phone: text("phone"), // E.164 digits without "+", e.g. 254712345678
   passwordHash: text("password_hash").notNull(),
   isAdmin: boolean("is_admin").notNull().default(false),
+  country: text("country").notNull().default("KE"), // ISO 3166-1 alpha-2
+  timezone: text("timezone").notNull().default("Africa/Nairobi"), // IANA
+  locale: text("locale").notNull().default("en"), // UI language
   trialEndsAt: date("trial_ends_at").notNull(),
   paidUntil: date("paid_until"),
   reminderSentFor: date("reminder_sent_for"), // access end date we last reminded about
+  // Card subscriptions (Paddle). M-Pesa plans are prepaid and need no stored state.
+  paddleCustomerId: text("paddle_customer_id"),
+  paddleSubscriptionId: text("paddle_subscription_id"),
+  paddleSubscriptionStatus: text("paddle_subscription_status"),
+  paddleManageUrl: text("paddle_manage_url"),
+  paddleCancelUrl: text("paddle_cancel_url"),
   createdAt: createdAt(),
-}, (t) => [uniqueIndex("users_email_key").on(t.email)]);
+}, (t) => [uniqueIndex("users_email_key").on(t.email), index("users_paddle_sub_idx").on(t.paddleSubscriptionId)]);
 
 export const sessions = pgTable("sessions", {
   tokenHash: text("token_hash").primaryKey(),
@@ -46,6 +56,7 @@ export const budgets = pgTable("budgets", {
   userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   horizonDays: integer("horizon_days").notNull().default(31),
+  currency: text("currency").notNull().default("KES"), // ISO 4217; every amount in this budget
   createdAt: createdAt(),
 }, (t) => [index("budgets_user_idx").on(t.userId)]);
 
@@ -77,11 +88,12 @@ export const items = pgTable("items", {
 export const payments = pgTable("payments", {
   id: id(),
   userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  provider: text("provider").notNull(), // "mpesa" today; Airtel/aggregators later
+  provider: text("provider").notNull(), // "mpesa" | "paddle" (Airtel/others later)
   plan: text("plan").notNull(),
-  amount: integer("amount").notNull(), // whole KES
-  phone: text("phone").notNull(),
-  providerRef: text("provider_ref"), // Daraja CheckoutRequestID
+  amount: bigint("amount", { mode: "number" }).notNull(), // minor units of `currency`
+  currency: text("currency").notNull().default("KES"),
+  phone: text("phone"), // M-Pesa only
+  providerRef: text("provider_ref"), // Daraja CheckoutRequestID / Paddle transaction id
   merchantRef: text("merchant_ref"),
   status: text("status", { enum: ["pending", "success", "failed"] }).notNull().default("pending"),
   resultCode: text("result_code"),

@@ -8,15 +8,25 @@ export interface Item {
   endDate: string | null; tieTo: string | null; done: boolean; accountId: string | null; note: string; sort: number;
 }
 export interface BudgetPayload {
-  budget: { id: string; name: string; horizonDays: number };
+  budget: { id: string; name: string; horizonDays: number; currency: string };
   accounts: Account[];
   items: Item[];
   projection: Projection;
 }
-export interface BudgetSummary { id: string; name: string; horizonDays: number }
-export interface Subscription { active: boolean; onTrial: boolean; accessUntil: string; daysLeft: number }
-export interface Me { id: string; name: string; email: string; phone: string; phoneDisplay: string; isAdmin: boolean; subscription: Subscription }
-export interface Plan { key: string; label: string; days: number; amount: number }
-export interface Payment { id: string; plan: string; amount: number; phone: string; status: "pending" | "success" | "failed"; resultDesc: string; receipt: string; createdAt: string }
+export interface BudgetSummary { id: string; name: string; horizonDays: number; currency: string }
+export interface Subscription { active: boolean; onTrial: boolean; accessUntil: string; daysLeft: number; card: string | null }
+export interface Me {
+  id: string; name: string; email: string; phone: string; phoneDisplay: string; isAdmin: boolean;
+  country: string; timezone: string; locale: string; defaultCurrency: string;
+  subscription: Subscription;
+  card: { status: string | null; manageUrl: string | null; cancelUrl: string | null } | null;
+}
+/** Prices in minor units: `kes` for M-Pesa, `usd` for display elsewhere (Paddle shows the real local price). */
+export interface Plan { key: "monthly" | "quarterly" | "yearly"; days: number; kes: number; usd: number; paddlePriceId: string | null }
+export interface PaymentConfig { mpesaEnv: string; paddleEnv: string; paddleClientToken: string | null; cardEnabled: boolean }
+export interface Payment {
+  id: string; provider: string; plan: string; amount: number; currency: string; phone: string;
+  status: "pending" | "success" | "failed"; resultDesc: string; receipt: string; createdAt: string;
+}
 
 export type Tab = "overview" | "items" | "daily" | "settings";

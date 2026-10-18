@@ -1,40 +1,53 @@
-import { and, desc, eq, sql } from "drizzle-orm";
-import { addDays, todayInNairobi } from "@/lib/dates";
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
+import { currencyForCountry, isCountry } from "@/lib/countries";
+import { addDays, isTimeZone, todayIn } from "@/lib/dates";
+import { isLocale, translator, type Locale } from "@/i18n/translate";
 import { db, schema } from "../db";
 import { dummyPasswordHash, hashPassword, hashResetCode, newResetCode, verifyPassword, verifyResetCode } from "../auth/crypto";
 import { createSession, type User } from "../auth/session";
 import { env, isAdminEmail } from "../env";
 import { ApiError } from "../http";
 import { queueMessage } from "../jobs/queue";
-import { displayPhone, normalizeKenyanPhone } from "../payments/phone";
-import { subscriptionStatus } from "./billing";
+import { cancelSubscriptionNow } from "../payments/paddle";
+import { displayPhone, normalizePhone } from "../payments/phone";
+import { paymentJson, subscriptionStatus } from "./billing";
 import { seedBudget } from "./budgets";
 
 export function userJson(u: User) {
   return {
-    id: u.id, name: u.name, email: u.email, phone: u.phone ?? "", phoneDisplay: displayPhone(u.phone),
-    isAdmin: u.isAdmin, subscription: subscriptionStatus(u),
+    id: u.id, name: u.name, email: u.email, phone: u.phone ?? "", phoneDisplay: displayPhone(u.phone, u.country),
+    isAdmin: u.isAdmin, country: u.country, timezone: u.timezone, locale: u.locale,
+    defaultCurrency: currencyForCountry(u.country),
+    subscription: subscriptionStatus(u),
+    card: u.paddleSubscriptionId ? { status: u.paddleSubscriptionStatus, manageUrl: u.paddleManageUrl, cancelUrl: u.paddleCancelUrl } : null,
   };
 }
 
-function phoneOrThrow(raw: string | undefined): string | null {
+function phoneOrThrow(raw: string | undefined, country: string): string | null {
   if (!raw) return null;
-  const p = normalizeKenyanPhone(raw);
-  if (!p) throw new ApiError(400, "Enter a valid M-Pesa number, e.g. 0712 345 678.");
+  const p = normalizePhone(raw, country);
+  if (!p) throw new ApiError(400, "errors.phoneInvalid");
   return p;
 }
 
-export async function signup(input: { name: string; email: string; password: string; phone?: string }) {
-  const phone = phoneOrThrow(input.phone);
+export async function signup(input: {
+  name: string; email: string; password: string; phone?: string;
+  country?: string; timezone?: string; locale?: string;
+}, hints: { country?: string | null; locale?: Locale } = {}) {
+  const country = isCountry(input.country) ? input.country : isCountry(hints.country) ? hints.country! : "KE";
+  const timezone = isTimeZone(input.timezone) ? input.timezone : "UTC";
+  const locale = isLocale(input.locale) ? input.locale : hints.locale ?? "en";
+  const phone = phoneOrThrow(input.phone, country);
   const passwordHash = await hashPassword(input.password);
   return db.transaction(async (tx) => {
     const existing = await tx.select({ id: schema.users.id }).from(schema.users).where(eq(schema.users.email, input.email)).limit(1);
-    if (existing.length) throw new ApiError(409, "An account with that email already exists. Log in instead.");
+    if (existing.length) throw new ApiError(409, "errors.emailTaken");
     const [user] = await tx.insert(schema.users).values({
       email: input.email, name: input.name, phone, passwordHash, isAdmin: isAdminEmail(input.email),
-      trialEndsAt: addDays(todayInNairobi(), env().TRIAL_DAYS - 1),
+      country, timezone, locale,
+      trialEndsAt: addDays(todayIn(timezone), env().TRIAL_DAYS - 1),
     }).returning();
-    await seedBudget(tx, user!.id);
+    await seedBudget(tx, user!.id, currencyForCountry(country), locale);
     const session = await createSession(user!.id, tx);
     return { user: user!, session };
   });
@@ -44,20 +57,24 @@ export async function login(email: string, password: string) {
   const [user] = await db.select().from(schema.users).where(eq(schema.users.email, email)).limit(1);
   // Verify against a dummy hash for unknown emails so response time doesn't reveal which emails exist.
   const ok = await verifyPassword(password, user?.passwordHash ?? (await dummyPasswordHash()));
-  if (!user || !ok) throw new ApiError(401, "Wrong email or password.");
+  if (!user || !ok) throw new ApiError(401, "errors.wrongLogin");
   return { user, session: await createSession(user.id) };
 }
 
-export async function updateProfile(user: User, input: { name?: string; phone?: string }) {
+export async function updateProfile(user: User, input: { name?: string; phone?: string; country?: string; timezone?: string; locale?: string }) {
+  const country = input.country ?? user.country;
   const [u] = await db.update(schema.users).set({
     name: input.name ?? user.name,
-    phone: input.phone === undefined ? user.phone : phoneOrThrow(input.phone),
+    phone: input.phone === undefined ? user.phone : phoneOrThrow(input.phone, country),
+    country,
+    timezone: input.timezone ?? user.timezone,
+    locale: input.locale ?? user.locale,
   }).where(eq(schema.users.id, user.id)).returning();
   return u!;
 }
 
 export async function changePassword(user: User, current: string, next: string) {
-  if (!(await verifyPassword(current, user.passwordHash))) throw new ApiError(400, "Current password is wrong.");
+  if (!(await verifyPassword(current, user.passwordHash))) throw new ApiError(400, "errors.wrongPassword");
   const passwordHash = await hashPassword(next);
   return db.transaction(async (tx) => {
     await tx.update(schema.users).set({ passwordHash }).where(eq(schema.users.id, user.id));
@@ -66,10 +83,41 @@ export async function changePassword(user: User, current: string, next: string) 
   });
 }
 
+// ---------------------------------------------------------------- GDPR: access & erasure
+
+/** Everything we hold about a user, for "download my data" (GDPR Art. 15/20). */
+export async function exportUserData(user: User) {
+  const budgets = await db.select().from(schema.budgets).where(eq(schema.budgets.userId, user.id));
+  const ids = budgets.map((b) => b.id);
+  const [accounts, items, payments] = await Promise.all([
+    ids.length ? db.select().from(schema.accounts).where(inArray(schema.accounts.budgetId, ids)) : [],
+    ids.length ? db.select().from(schema.items).where(inArray(schema.items.budgetId, ids)) : [],
+    db.select().from(schema.payments).where(eq(schema.payments.userId, user.id)),
+  ]);
+  const { passwordHash: _omit, ...profile } = user;
+  return {
+    exportedAt: new Date().toISOString(),
+    note: "Amounts are in minor units (cents) of each budget's or payment's currency.",
+    profile,
+    budgets: budgets.map((b) => ({ ...b, accounts: accounts.filter((a) => a.budgetId === b.id), items: items.filter((i) => i.budgetId === b.id) })),
+    payments: payments.map(paymentJson),
+  };
+}
+
+/** Permanently deletes the account (GDPR Art. 17). Cancels any card subscription first. */
+export async function deleteAccount(user: User, password: string) {
+  if (!(await verifyPassword(password, user.passwordHash))) throw new ApiError(400, "errors.wrongPassword");
+  if (user.paddleSubscriptionId && user.paddleSubscriptionStatus !== "canceled") {
+    await cancelSubscriptionNow(user.paddleSubscriptionId);
+  }
+  // Budgets, accounts, items, sessions, resets and payments cascade.
+  await db.delete(schema.users).where(eq(schema.users.id, user.id));
+}
+
 // ---------------------------------------------------------------- password reset
 
-export const RESET_SENT_MESSAGE = "If that email has an account, we've sent a 6-digit code to it (and by SMS to its phone number, if saved).";
-const RESET_INVALID = "That code is wrong or has expired. Request a new one.";
+export const RESET_SENT_KEY = "auth.resetSent" as const;
+const RESET_INVALID = "errors.resetInvalid" as const;
 
 /** Always resolves the same way whether or not the account exists. */
 export async function requestReset(email: string): Promise<void> {
@@ -84,10 +132,11 @@ export async function requestReset(email: string): Promise<void> {
     });
   });
   const app = env().APP_NAME;
+  const { t } = translator(isLocale(user.locale) ? user.locale : "en");
   await queueMessage({
     kind: "reset_code", email: user.email, name: user.name, phone: user.phone,
-    subject: `${app} password reset code`,
-    text: `Hi ${user.name}, your ${app} reset code is ${code}. It expires in ${env().RESET_CODE_MINUTES} minutes. If you didn't ask for this, ignore this message.`,
+    subject: t("notify.resetSubject", { app }),
+    text: t("notify.resetBody", { name: user.name, app, code, minutes: env().RESET_CODE_MINUTES }),
   });
 }
 

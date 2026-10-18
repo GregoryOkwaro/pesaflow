@@ -6,8 +6,8 @@ import { subscribeInput } from "@/server/validation";
 
 export const POST = handler(async (req) => {
   const user = await requireUser();
-  await enforce(`pay:${user.id}`, 5, 600, "Too many payment attempts. Wait a few minutes.");
+  await enforce(`pay:${user.id}`, 5, 600, "errors.ratePay");
   const { plan, phone } = await body(req, subscribeInput);
-  const { payment, message } = await startPayment(user, plan, phone || user.phone || "");
-  return json({ payment: paymentJson(payment), message }, 201);
+  const { payment } = await startPayment(user, plan, phone || user.phone || "");
+  return json({ payment: paymentJson(payment) }, 201);
 });

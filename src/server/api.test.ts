@@ -16,7 +16,7 @@ import * as budgets from "@/app/api/budgets/route";
 import * as itemRoute from "@/app/api/items/[id]/route";
 import * as me from "@/app/api/me/route";
 import * as callback from "@/app/api/mpesa/callback/[secret]/route";
-import { addDays, todayInNairobi } from "@/lib/dates";
+import { addDays, todayIn } from "@/lib/dates";
 import { db, schema } from "@/server/db";
 import { outbox } from "@/server/notify/channels";
 import { sendRenewalReminders } from "@/server/services/reminders";
@@ -30,7 +30,7 @@ async function signup(email: string, password = "password123") {
 }
 const firstBudget = async (c: TestClient) => (await c.call(budgets, "GET")).data.budgets[0].id as string;
 const expire = (email: string) =>
-  db.update(schema.users).set({ trialEndsAt: addDays(todayInNairobi(), -1), paidUntil: null }).where(eq(schema.users.email, email));
+  db.update(schema.users).set({ trialEndsAt: addDays(todayIn("UTC"), -1), paidUntil: null }).where(eq(schema.users.email, email));
 
 beforeEach(async () => {
   await resetDb();
@@ -76,7 +76,7 @@ describe("budgets", () => {
     d = (await c.call(accountRoute, "PUT", { params: { id: d.accounts[0].id }, body: { balance: "1,000.50" } })).data;
     expect(d.projection.openingBalance).toBe(100050);
     for (const i of d.items) await c.call(itemRoute, "DELETE", { params: { id: i.id } });
-    const r = await c.call(budgetItems, "POST", { params: { id }, body: { name: "Lunch", amount: -100, everyDays: 1, valueDate: todayInNairobi() } });
+    const r = await c.call(budgetItems, "POST", { params: { id }, body: { name: "Lunch", amount: -100, everyDays: 1, valueDate: todayIn("UTC") } });
     expect(r.status).toBe(201);
     expect(r.data.projection.closingBalance).toBe(100050 - 310000);
     const item = r.data.items[0];
@@ -221,9 +221,9 @@ describe("password reset", () => {
 describe("renewal reminders", () => {
   it("reminds once per access period, by email and SMS", async () => {
     await signup("remind@example.com");
-    await db.update(schema.users).set({ trialEndsAt: addDays(todayInNairobi(), 1) }).where(eq(schema.users.email, "remind@example.com"));
-    expect(await sendRenewalReminders()).toBe(1);
-    expect(await sendRenewalReminders()).toBe(0);
+    await db.update(schema.users).set({ trialEndsAt: addDays(todayIn("UTC"), 1) }).where(eq(schema.users.email, "remind@example.com"));
+    expect(await sendRenewalReminders({ force: true })).toBe(1);
+    expect(await sendRenewalReminders({ force: true })).toBe(0);
     const msg = outbox.find((m) => m.kind === "renewal_reminder")!;
     expect(msg.phone).toBe("254712345678");
     expect(msg.subject).toContain("free trial");

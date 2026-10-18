@@ -1,0 +1,44 @@
+# Local development: PostgreSQL 18. Production uses a managed Postgres 18 instead.
+#   docker compose up -d db
+services:
+  db:
+    image: postgres:18
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: pesaflow
+      POSTGRES_PASSWORD: pesaflow_dev_only
+      POSTGRES_DB: pesaflow
+    ports:
+      - "5433:5432"
+    volumes:
+      # Postgres 18 images keep data under /var/lib/postgresql (versioned subfolder inside).
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pesaflow -d pesaflow"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # Full stack in containers (optional locally; mirrors production):
+  #   docker compose --profile full up --build
+  app:
+    profiles: ["full"]
+    build: { context: ., target: web }
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://pesaflow:pesaflow_dev_only@db:5432/pesaflow
+    ports:
+      - "3000:3000"
+    depends_on:
+      db: { condition: service_healthy }
+  worker:
+    profiles: ["full"]
+    build: { context: ., target: worker }
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://pesaflow:pesaflow_dev_only@db:5432/pesaflow
+    depends_on:
+      db: { condition: service_healthy }
+
+volumes:
+  pgdata:

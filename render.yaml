@@ -1,52 +1,37 @@
-# Render Blueprint: website + background worker + PostgreSQL 18, all in Frankfurt.
-# Render dashboard → New → Blueprint → choose this GitHub repository → Apply.
+# Render Blueprint, free plan: one web service, no card needed.
+# Render dashboard → New → Blueprint → choose this GitHub repository → paste the
+# Neon connection string when asked for DATABASE_URL → Deploy Blueprint.
 #
-# Payments and messages start in mock (test) mode: no business registration is
-# needed, but no real money is collected either. Switch each one to live in the
-# Render dashboard (Environment) once your accounts are approved; see README.
-
-databases:
-  - name: pesaflow-db
-    databaseName: pesaflow
-    user: pesaflow
-    region: frankfurt
-    postgresMajorVersion: "18"
+# Free-plan notes:
+#  - The database is Neon's free PostgreSQL 18 (neon.com, no card). Render's own free
+#    database is deleted after 30 days, so it isn't used.
+#  - There are no free background workers, so the website applies migrations at
+#    startup and runs the jobs itself (RUN_WORKER_IN_WEB=1).
+#  - The service sleeps after 15 minutes without visitors; the next visit takes
+#    about a minute to wake it, and scheduled jobs pause while it sleeps.
+#  - Payments and messages are in mock (test) mode: no business registration
+#    needed, no real money collected. Switch them on later (see README).
+#
+# To move to paid (always-on) hosting later, set plan to a paid size and add the
+# worker back (Dockerfile.worker) with RUN_WORKER_IN_WEB removed.
 
 services:
   - type: web
     name: pesaflow
     runtime: docker
+    plan: free
     dockerfilePath: ./Dockerfile
     region: frankfurt
     healthCheckPath: /api/health
     envVars:
       - key: DATABASE_URL
-        fromDatabase:
-          name: pesaflow-db
-          property: connectionString
+        sync: false # paste Neon's connection string when Render asks
+      - key: RUN_WORKER_IN_WEB
+        value: "1"
       - key: JOBS_INLINE
         value: "0"
-      - key: MPESA_ENV
-        value: mock
-      - key: PADDLE_ENV
-        value: mock
-      - key: FLW_ENV
-        value: mock
-      - key: NOTIFY_ENV
-        value: mock
-      - key: ADMIN_EMAILS
-        value: gregoryokwaro@gmail.com
-
-  - type: worker
-    name: pesaflow-worker
-    runtime: docker
-    dockerfilePath: ./Dockerfile.worker
-    region: frankfurt
-    envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: pesaflow-db
-          property: connectionString
+      - key: DB_POOL_MAX
+        value: "5"
       - key: MPESA_ENV
         value: mock
       - key: PADDLE_ENV

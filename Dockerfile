@@ -21,6 +21,8 @@ RUN useradd --system --uid 1001 pesaflow
 COPY --from=build --chown=pesaflow /app/.next/standalone ./
 COPY --from=build --chown=pesaflow /app/.next/static ./.next/static
 COPY --from=build --chown=pesaflow /app/public ./public
+# SQL migrations, applied at startup when RUN_WORKER_IN_WEB=1 (single-process hosting).
+COPY --from=build --chown=pesaflow /app/drizzle ./drizzle
 USER pesaflow
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s CMD node -e "fetch('http://localhost:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"

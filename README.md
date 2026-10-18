@@ -149,13 +149,22 @@ docker build -f Dockerfile.worker -t pesaflow-worker .   # migrations + jobs; ru
 Run both with the same environment variables (`JOBS_INLINE=0`) on any container host (DigitalOcean
 App Platform, Render, Fly.io, AWS ECS). Scale web horizontally; one or two workers are plenty.
 
-**Quickest: Render (recommended to start).** `render.yaml` sets up the website, the worker and a
-managed PostgreSQL 18 database in Frankfurt in one go (about USD 20/month on the smallest paid sizes):
+**Free to start: Render + Neon (no card, no business registration).** `render.yaml` creates one free
+web service in Frankfurt; the database is Neon's free PostgreSQL 18:
 1. Put the code in a private GitHub repository.
-2. At render.com, sign up with GitHub and add a payment card.
-3. **New → Blueprint**, pick the repository, then **Apply**. The first deploy takes about 10 minutes.
+2. At neon.com, sign up (no card), create a project with **Postgres 18** in an EU region (e.g.
+   Frankfurt), and copy the connection string with **connection pooling turned off**
+   (`postgresql://…?sslmode=require`).
+3. At render.com, sign up with GitHub. **New → Blueprint**, pick the repository, paste the Neon
+   string into `DATABASE_URL`, then **Deploy Blueprint** (about 10 minutes the first time).
 4. Open the `pesaflow` service's `https://….onrender.com` address. The app uses it automatically
-   (`RENDER_EXTERNAL_URL`); set `PUBLIC_URL` on both services once you have your own domain.
+   (`RENDER_EXTERNAL_URL`); set `PUBLIC_URL` once you have your own domain.
+
+On the free plan the website applies migrations at startup and runs the background jobs itself
+(`RUN_WORKER_IN_WEB=1`, see `src/instrumentation.ts`). It sleeps after 15 minutes without visitors
+(about a minute to wake) and scheduled jobs pause while it sleeps. To go always-on, change the
+service's plan to a paid size (about USD 7/month) or add a separate worker from `Dockerfile.worker`
+and remove `RUN_WORKER_IN_WEB`.
 
 Everything starts in mock mode (`MPESA_ENV`, `FLW_ENV`, `PADDLE_ENV`, `NOTIFY_ENV`): sign-ups work, but
 "payments" are simulated and anyone can unlock a plan for free, and reset codes only appear in the

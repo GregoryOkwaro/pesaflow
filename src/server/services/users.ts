@@ -1,7 +1,7 @@
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { currencyForCountry, isCountry } from "@/lib/countries";
 import { addDays, isTimeZone, todayIn } from "@/lib/dates";
-import { isLocale, translator, type Locale } from "@/i18n/translate";
+import { dirOf, isLocale, translator, type Locale } from "@/i18n/translate";
 import { db, schema } from "../db";
 import { dummyPasswordHash, hashPassword, hashResetCode, newResetCode, verifyPassword, verifyResetCode } from "../auth/crypto";
 import { createSession, type User } from "../auth/session";
@@ -134,7 +134,7 @@ export async function requestReset(email: string): Promise<void> {
   const app = env().APP_NAME;
   const { t } = translator(isLocale(user.locale) ? user.locale : "en");
   await queueMessage({
-    kind: "reset_code", email: user.email, name: user.name, phone: user.phone,
+    kind: "reset_code", email: user.email, name: user.name, phone: user.phone, dir: dirOf(user.locale),
     subject: t("notify.resetSubject", { app }),
     text: t("notify.resetBody", { name: user.name, app, code, minutes: env().RESET_CODE_MINUTES }),
   });

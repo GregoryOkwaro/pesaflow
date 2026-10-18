@@ -34,5 +34,6 @@ export function loadPaddle(token: string, env: string): Promise<PaddleJs> {
   return ready;
 }
 
-/** Paddle checkout languages; anything else (e.g. Swahili) falls back to English. */
-export const paddleLocale = (l: string) => (["en", "fr", "de", "es", "pt", "it", "nl", "pl", "ja", "ko", "zh-Hans", "ru", "tr", "sv", "da", "no"].includes(l) ? l : "en");
+/** Paddle checkout languages we map to; anything else (e.g. Swahili, Hausa) falls back to English. */
+const PADDLE_LOCALES = new Set(["en", "ar", "zh-Hans", "da", "nl", "fr", "de", "it", "ja", "ko", "no", "pl", "pt", "ru", "es", "sv", "tr"]);
+export const paddleLocale = (l: string) => (PADDLE_LOCALES.has(l) ? l : "en");

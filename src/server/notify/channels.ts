@@ -9,12 +9,13 @@ export interface Message {
   phone?: string | null; // E.164 digits, e.g. 254712345678
   subject: string;
   text: string;
+  dir?: "rtl" | "ltr"; // Arabic / Urdu emails render right-to-left
 }
 
 /** NOTIFY_ENV=mock: messages land here (and in the log) instead of being sent. */
 export const outbox: Message[] = [];
 
-export async function sendEmail(to: string, name: string | undefined, subject: string, text: string): Promise<void> {
+export async function sendEmail(to: string, name: string | undefined, subject: string, text: string, dir: "rtl" | "ltr" = "ltr"): Promise<void> {
   const e = env();
   if (!e.ZEPTOMAIL_TOKEN) throw new Error("ZEPTOMAIL_TOKEN is not set");
   const html = `<div style="font-family:system-ui,sans-serif;font-size:15px;line-height:1.5;color:#17201a">${escapeHtml(text).replace(/\n/g, "<br>")}</div>`;
@@ -70,7 +71,7 @@ export async function deliver(msg: Message): Promise<void> {
     return;
   }
   const attempts: Promise<void>[] = [];
-  if (msg.email && e.ZEPTOMAIL_TOKEN) attempts.push(sendEmail(msg.email, msg.name, msg.subject, msg.text));
+  if (msg.email && e.ZEPTOMAIL_TOKEN) attempts.push(sendEmail(msg.email, msg.name, msg.subject, msg.text, msg.dir));
   if (msg.phone && e.AT_USERNAME && e.AT_API_KEY && smsSupported(msg.phone)) attempts.push(sendSms(msg.phone, msg.text));
   if (!attempts.length) throw new Error("No delivery channel configured (set ZEPTOMAIL_TOKEN and/or AT_USERNAME + AT_API_KEY).");
   const results = await Promise.allSettled(attempts);

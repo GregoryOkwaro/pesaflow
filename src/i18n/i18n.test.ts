@@ -26,14 +26,21 @@ const SAME_OK = new Set(["common.add", "landing.privacy", "daily.total", "daily.
 
 describe.each(LOCALES.filter((l) => l !== "en"))("%s translation", (locale) => {
   const dict = flatten(DICTIONARIES[locale] as unknown as Tree);
-  it("has exactly the English keys", () => {
-    expect(Object.keys(dict).sort()).toEqual(Object.keys(en).sort());
+  it("has exactly the English keys (plus extra CLDR plural forms inside plural groups)", () => {
+    const extraForm = /\.(zero|two|few|many)$/;
+    const core = Object.keys(dict).filter((k) => !extraForm.test(k));
+    expect(core.sort()).toEqual(Object.keys(en).sort());
+    for (const k of Object.keys(dict).filter((k) => extraForm.test(k))) {
+      expect(en[k.replace(extraForm, ".other")], `${k} must belong to a plural group`).toBeDefined();
+    }
   });
   it("keeps every placeholder and has no empty strings", () => {
     for (const [key, value] of Object.entries(dict)) {
       expect(value.trim(), key).not.toBe("");
-      // A singular form may say "the next day" instead of "the next {count} day".
-      const expected = key.endsWith(".one") ? placeholders(en[key]!).filter((p) => p !== "count" || placeholders(value).includes("count")) : placeholders(en[key]!);
+      // Plural forms other than "other" may spell the number out ("the next day", "يومان").
+      const pluralForm = /\.(zero|one|two|few|many)$/.test(key);
+      const ref = en[key] ?? en[key.replace(/\.(zero|two|few|many)$/, ".other")]!;
+      const expected = placeholders(ref).filter((p) => !(pluralForm && p === "count") || placeholders(value).includes("count"));
       expect(placeholders(value), key).toEqual(expected);
     }
   });

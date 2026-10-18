@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { I18nProvider } from "@/i18n/client";
 import { getT, requestLocale } from "@/i18n/server";
+import { DICTIONARIES, dirOf } from "@/i18n/translate";
 import "./globals.css";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -26,9 +27,9 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const locale = await requestLocale();
   return (
-    <html lang={locale}>
+    <html lang={locale} dir={dirOf(locale)}>
       <body>
-        <I18nProvider locale={locale}>{children}</I18nProvider>
+        <I18nProvider locale={locale} messages={DICTIONARIES[locale]}>{children}</I18nProvider>
       </body>
     </html>
   );

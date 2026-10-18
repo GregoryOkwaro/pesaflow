@@ -12,7 +12,7 @@
 import { and, desc, eq, lt } from "drizzle-orm";
 import { addDays, diffDays, formatDate, todayIn, type ISODate } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
-import { translator, isLocale } from "@/i18n/translate";
+import { dirOf, translator, isLocale } from "@/i18n/translate";
 import { db, schema } from "../db";
 import { env, isPlan, mpesaPrice, PLAN_DAYS, type PlanKey } from "../env";
 import { ApiError } from "../http";
@@ -109,7 +109,7 @@ async function sendReceipt(paymentId: string) {
   const { t } = translator(locale);
   const app = env().APP_NAME;
   await queueMessage({
-    kind: "payment_receipt", email: row.u.email, name: row.u.name, phone: null,
+    kind: "payment_receipt", email: row.u.email, name: row.u.name, phone: null, dir: dirOf(locale),
     subject: t("notify.receiptSubject", { app }),
     text: t("notify.receiptBody", {
       name: row.u.name, app,

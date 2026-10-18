@@ -103,8 +103,8 @@ textarea { min-height: 70px; resize: vertical; }
 .tabs button { flex: 1; border: 0; background: transparent; padding: 10px; border-radius: 9px; font-weight: 700; cursor: pointer; color: var(--muted); }
 .tabs button.on { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
 .perks { list-style: none; padding: 0; margin: 18px 0 0; color: var(--muted); font-size: 13px; }
-.perks li { padding-left: 22px; position: relative; margin: 6px 0; }
-.perks li::before { content: "✓"; position: absolute; left: 0; color: var(--pos); font-weight: 800; }
+.perks li { padding-inline-start: 22px; position: relative; margin: 6px 0; }
+.perks li::before { content: "✓"; position: absolute; inset-inline-start: 0; color: var(--pos); font-weight: 800; }
 
 /* ---------- shell ---------- */
 .topbar {
@@ -147,7 +147,7 @@ main { max-width: 1180px; margin: 0 auto; padding: 16px 16px 96px; }
 .alert.bad { background: var(--neg-soft); color: var(--neg); }
 .alert.warn { background: var(--warn-soft); color: var(--warn); }
 .alert.ok { background: var(--brand-soft); color: var(--pos); }
-.alert .btn { margin-left: auto; flex-shrink: 0; }
+.alert .btn { margin-inline-start: auto; flex-shrink: 0; }
 .grid-2 { display: grid; gap: 16px; }
 @media (min-width: 900px) { .grid-2 { grid-template-columns: 1.6fr 1fr; align-items: start; } .grid-2 > .card + .card { margin-top: 0; } }
 
@@ -184,7 +184,7 @@ main { max-width: 1180px; margin: 0 auto; padding: 16px 16px 96px; }
 .item .body { flex: 1; min-width: 0; cursor: pointer; }
 .item .title { font-weight: 700; overflow-wrap: anywhere; }
 .item .meta { font-size: 12px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 2px; }
-.item .amt { font-weight: 800; text-align: right; }
+.item .amt { font-weight: 800; text-align: end; }
 .chip { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 999px; background: var(--surface-2); color: var(--muted); }
 .chip.tie { background: var(--warn-soft); color: var(--warn); }
 .empty { text-align: center; color: var(--muted); padding: 30px 10px; }
@@ -192,18 +192,18 @@ main { max-width: 1180px; margin: 0 auto; padding: 16px 16px 96px; }
 /* ---------- day grid ---------- */
 .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); -webkit-overflow-scrolling: touch; }
 table.daygrid { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 13px; }
-table.daygrid th, table.daygrid td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: right; white-space: nowrap; }
+table.daygrid th, table.daygrid td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: end; white-space: nowrap; }
 table.daygrid th { background: var(--surface-2); font-size: 12px; position: sticky; top: 0; z-index: 1; color: var(--muted); }
 table.daygrid th.item-col { max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
-table.daygrid td.l, table.daygrid th.l { text-align: left; }
-table.daygrid .sticky { position: sticky; left: 0; background: var(--surface); z-index: 2; }
+table.daygrid td.l, table.daygrid th.l { text-align: start; }
+table.daygrid .sticky { position: sticky; inset-inline-start: 0; background: var(--surface); z-index: 2; }
 table.daygrid th.sticky { background: var(--surface-2); z-index: 3; }
 table.daygrid tr.today td { background: var(--brand-soft); }
 table.daygrid tr.weekend td.l { color: var(--muted); }
 table.daygrid tr.negative td.bal { color: var(--neg); font-weight: 800; }
 table.daygrid td.bal, table.daygrid td.net { font-weight: 700; }
 table.daygrid tr.clickable { cursor: pointer; }
-table.daygrid tr.detail td { text-align: left; background: var(--surface-2); white-space: normal; }
+table.daygrid tr.detail td { text-align: start; background: var(--surface-2); white-space: normal; }
 .flow-line { display: flex; justify-content: space-between; gap: 12px; padding: 2px 0; }
 
 /* ---------- modal ---------- */
@@ -218,7 +218,7 @@ table.daygrid tr.detail td { text-align: left; background: var(--surface-2); whi
 .plan { display: flex; align-items: center; gap: 12px; padding: 14px; border: 2px solid var(--border); border-radius: 12px; cursor: pointer; }
 .plan input { accent-color: var(--brand); width: 18px; height: 18px; }
 .plan.on { border-color: var(--brand); background: var(--brand-soft); }
-.plan .price { margin-left: auto; font-weight: 800; }
+.plan .price { margin-inline-start: auto; font-weight: 800; }
 .mpesa-wait { text-align: center; padding: 10px 0 4px; }
 .spinner { width: 38px; height: 38px; border: 4px solid var(--border); border-top-color: var(--brand); border-radius: 50%; margin: 6px auto 14px; animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -242,4 +242,24 @@ table.daygrid tr.detail td { text-align: left; background: var(--surface-2); whi
 @media (max-width: 899px) { .wide-only { display: none; } }
 .toolbar input[type=search] { flex: 1 1 200px; }
 .lang-select { min-height: 38px; padding: 6px 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); max-width: 140px; }
-.plan .price .small { margin-left: 2px; }
+.plan .price .small { margin-inline-start: 2px; }
+
+/* ---------- world scripts ----------
+   System fonts cover CJK, Arabic, Devanagari, Bengali, Thai and Ethiopic on current OSes;
+   these stacks pick the best installed face per script. */
+:lang(ar) body, :lang(ar) button, :lang(ar) input, :lang(ar) select, :lang(ar) textarea { font-family: "Segoe UI", "Noto Naskh Arabic", "Noto Sans Arabic", Tahoma, system-ui, sans-serif; }
+:lang(ur) body, :lang(ur) button, :lang(ur) input, :lang(ur) select, :lang(ur) textarea { font-family: "Noto Nastaliq Urdu", "Jameel Noori Nastaleeq", "Segoe UI", "Noto Naskh Arabic", Tahoma, system-ui, sans-serif; line-height: 1.9; }
+:lang(zh-Hans) body { font-family: system-ui, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif; }
+:lang(zh-Hant) body { font-family: system-ui, "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif; }
+:lang(ja) body { font-family: system-ui, "Hiragino Sans", "Yu Gothic UI", "Meiryo", "Noto Sans JP", sans-serif; }
+:lang(ko) body { font-family: system-ui, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif; }
+:lang(hi) body { font-family: system-ui, "Nirmala UI", "Kohinoor Devanagari", "Noto Sans Devanagari", sans-serif; }
+:lang(bn) body { font-family: system-ui, "Nirmala UI", "Kohinoor Bangla", "Noto Sans Bengali", sans-serif; }
+:lang(th) body { font-family: system-ui, "Leelawadee UI", "Thonburi", "Noto Sans Thai", sans-serif; }
+:lang(am) body { font-family: system-ui, "Nyala", "Kefa", "Noto Sans Ethiopic", sans-serif; }
+/* Numbers and amounts stay left-to-right inside right-to-left text. */
+[dir="rtl"] .num, [dir="rtl"] input[inputmode="decimal"], [dir="rtl"] input[type="tel"] { direction: ltr; unicode-bidi: isolate; }
+[dir="rtl"] .num { text-align: inherit; }
+/* Time runs left-to-right in charts in every language; labels must anchor accordingly. */
+.chart { direction: ltr; }
+[dir="rtl"] .chart-tip { text-align: start; }

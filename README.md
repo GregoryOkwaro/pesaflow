@@ -7,9 +7,9 @@ M-Pesa in Kenya, and cards, PayPal and local payment methods everywhere else.
 queue) · Safaricom Daraja (M-Pesa STK push) · Paddle (merchant of record, worldwide) · ZeptoMail
 (email) · Africa's Talking (SMS) · Cloudflare (DNS, CDN, firewall, Turnstile).
 
-**Global:** 6 languages (English, Kiswahili, Français, Español, Português, Deutsch) · any currency,
-with the correct decimal places · each user's own time zone · international phone numbers · GDPR data
-export and account deletion.
+**Global:** 26 languages, including right-to-left Arabic and Urdu · any currency, with the correct
+decimal places · each user's own time zone · international phone numbers · GDPR data export and
+account deletion.
 
 ```
 Cloudflare (DNS · CDN · WAF · Turnstile)
@@ -42,7 +42,7 @@ Local test accounts (exist only in your local database): `demo@pesaflow.test` / 
 In mock mode, reset codes and receipts appear in the `npm run dev` console.
 
 ```bash
-npm test            # 61 tests: spreadsheet parity, API, billing, Paddle, i18n, currencies, time zones, GDPR
+npm test            # 126 tests: spreadsheet parity, API, billing, Paddle, 26 languages, currencies, time zones, GDPR
 npm run typecheck
 npm run build
 ```
@@ -51,7 +51,7 @@ npm run build
 
 ```
 src/engine/            spreadsheet logic (pure TS, runs on server or browser) + parity tests
-src/i18n/              translations (messages/*.ts), language negotiation, plural rules
+src/i18n/              core.ts (browser-safe engine) · translate.ts (server, all dictionaries) · messages/*.ts
 src/lib/               dates (time zones), money (minor units, any currency), countries, API client
 src/server/db/         Drizzle schema (uuidv7 ids, bigint minor units), connection, migrator
 src/server/auth/       argon2id passwords, sessions (HttpOnly cookie, hashed tokens)
@@ -84,7 +84,10 @@ days match.
 
 | Concern | How the app handles it |
 |---|---|
-| **Language** | User setting → `pf_locale` cookie → browser `Accept-Language`. Switcher on every page. Emails, SMS, CSV headers and API errors are translated too. TypeScript refuses to build if a language is missing a key; a test checks placeholders match. |
+| **Language** | 26 languages (see below). User setting → `pf_locale` cookie → browser `Accept-Language` (`zh-TW`/`zh-HK` → Traditional Chinese). Switcher on every page. Emails, SMS, CSV headers and API errors are translated too. TypeScript refuses to build if a language is missing a key; tests check placeholders and plural forms. Browsers download only their own language. |
+| **Right-to-left** | Arabic and Urdu set `<html dir="rtl">`. The stylesheet uses logical properties (`inline-start`, `text-align: start`), so the whole layout mirrors. Amounts and phone numbers stay left-to-right, charts keep time running left to right, and emails render right-to-left. |
+| **Plurals** | Full CLDR rules per language: Arabic has six forms, Russian, Ukrainian and Polish four, and Chinese, Japanese, Korean, Thai, Vietnamese and Indonesian one. |
+| **Typing numbers** | Input follows the user's locale: `1.250,50` (German, French, Spanish, Indonesian…), `1,250.50` (English, Hindi…), Arabic-Indic digits `١٢٥٠`, full-width digits `１２５０` from Chinese and Japanese keyboards, Devanagari, Bengali and Thai digits. |
 | **Currency** | Each budget has an ISO 4217 currency. Amounts are integers in that currency's *minor units*, so JPY has no decimals and KWD has 3. Formatting follows the user's locale (`1.250,50 EUR` in German). |
 | **Time zone** | Each user has an IANA zone (detected at sign-up). "Today", due dates, trial ends and reminder times are all in the user's zone. |
 | **Country** | Picked at sign-up (pre-filled from Cloudflare's `CF-IPCountry` or the browser language). Sets the default currency, the phone-number format and the payment options. |
@@ -93,7 +96,23 @@ days match.
 | **Privacy (GDPR/DPA)** | "Download my data" (JSON) and "Delete my account" (cancels any Paddle subscription, then erases everything). Only essential cookies are used, so no cookie banner is needed. |
 | **Sanctions** | Iran, North Korea, Cuba, Syria and Russia aren't offered at sign-up, because the payment providers can't serve them (`src/lib/countries.ts`). |
 
-Translations are careful drafts. **Have a native speaker review each language before launch.**
+### Languages
+
+| | |
+|---|---|
+| Europe | English, Deutsch, Español, Français, Italiano, Nederlands, Polski, Português, Русский, Українська, Türkçe |
+| Middle East and South Asia | العربية (RTL), اردو (RTL), हिन्दी, বাংলা |
+| East and Southeast Asia | 简体中文, 繁體中文, 日本語, 한국어, Bahasa Indonesia, Tiếng Việt, ไทย |
+| Africa | Kiswahili, አማርኛ (Amharic), Hausa, Yorùbá |
+
+To add a language: copy `src/i18n/messages/en.ts`, translate it, and register it in `core.ts` and
+`translate.ts`. The build will show anything missing.
+
+Translations are careful drafts. **Have a native speaker review each language before launch**:
+Amharic, Hausa and Yoruba first (lowest confidence), then Arabic and Urdu (right-to-left wording and
+tone), then the rest. Persian and Hebrew are intentionally not included yet: Persian because Iran is
+excluded for sanctions, Hebrew until there's demand. Both would work like Arabic (right-to-left is
+already supported).
 
 ## Security
 - Argon2id password hashing. Login takes the same time whether or not the email exists.
@@ -186,4 +205,5 @@ users who saved a phone number in a country listed in `AT_SMS_COUNTRIES`; everyo
 - Alert by SMS when the projection goes negative within N days
 - Airtel Money / MTN MoMo (add a `PaymentProvider`)
 - Language-prefixed URLs (`/fr`, `/de`, …) with hreflang, for search engines in each language
-- Right-to-left languages (Arabic) once there's demand
+- Professional translation review, then a translation platform (Crowdin/Lokalise) for ongoing updates
+- More languages on demand: Tamil, Telugu, Marathi, Persian (Afghanistan), Hebrew, Filipino

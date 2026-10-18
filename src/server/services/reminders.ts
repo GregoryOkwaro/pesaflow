@@ -1,6 +1,6 @@
 import { and, eq, isNull, lt, or, sql } from "drizzle-orm";
 import { formatDate, todayIn } from "@/lib/dates";
-import { isLocale, translator } from "@/i18n/translate";
+import { dirOf, isLocale, translator } from "@/i18n/translate";
 import { db, schema } from "../db";
 import { env } from "../env";
 import { queueMessage } from "../jobs/queue";
@@ -36,7 +36,7 @@ export async function sendRenewalReminders(opts: { force?: boolean; now?: Date }
       : t("notify.whenOn", { date: formatDate(end, { weekday: "long", day: "numeric", month: "short" }, locale) });
     const vars = { app, name: u.name, when, url: `${env().PUBLIC_URL}/app` };
     await queueMessage({
-      kind: "renewal_reminder", email: u.email, name: u.name, phone: u.phone,
+      kind: "renewal_reminder", email: u.email, name: u.name, phone: u.phone, dir: dirOf(locale),
       subject: t(onTrial ? "notify.reminderSubjectTrial" : "notify.reminderSubjectPlan", vars),
       text: t(onTrial ? "notify.reminderBodyTrial" : "notify.reminderBodyPlan", vars),
     });

@@ -29,7 +29,7 @@ export function isCurrency(code: unknown): code is string {
 /** "1,250.50" / 1250.5 / "-300" -> minor units, or null if it isn't a valid amount for this currency. */
 export function parseMoney(input: unknown, currency: string): Minor | null {
   if (input === null || input === undefined || input === "") return 0;
-  const s = String(input).replace(/[,\s  ']/g, "");
+  const s = toAsciiDigits(String(input)).replace(/[,\s  ']/g, "");
   const exp = currencyExponent(currency);
   const re = exp > 0 ? new RegExp(`^-?\\d+(\\.\\d{1,${exp}})?$`) : /^-?\d+$/;
   if (!re.test(s)) return null;
@@ -38,6 +38,52 @@ export function parseMoney(input: unknown, currency: string): Minor | null {
   const minor = Number(whole) * 10 ** exp + Number((frac + "000").slice(0, exp) || 0);
   if (!Number.isSafeInteger(minor) || Math.abs(minor) > 1e15) return null;
   return negative ? -minor : minor;
+}
+
+// Digit blocks people actually type: Arabic-Indic, Persian/Urdu, Devanagari, Bengali, Thai, full-width (CJK IMEs).
+const DIGIT_ZEROS = [0x0660, 0x06f0, 0x0966, 0x09e6, 0x0e50, 0xff10];
+
+/** "١٢٥٠٫٥" / "１２５０" / "१२५०" -> "1250.5" / "1250" / "1250" (separators mapped too). */
+export function toAsciiDigits(s: string): string {
+  return s
+    .replace(/[٠-٩۰-۹०-९০-৯๐-๙０-９]/g, (ch) => {
+      const code = ch.codePointAt(0)!;
+      const zero = DIGIT_ZEROS.find((z) => code >= z && code <= z + 9)!;
+      return String(code - zero);
+    })
+    .replace(/٫/g, ".") // Arabic decimal separator
+    .replace(/٬/g, ",") // Arabic thousands separator
+    .replace(/[．。]/g, ".") // full-width / ideographic full stop
+    .replace(/[，、]/g, ",") // full-width / ideographic comma
+    .replace(/[−–－]/g, "-"); // minus sign, en dash, full-width hyphen
+}
+
+/** The decimal separator a locale uses ("." in en/ja/hi, "," in de/fr/es/pt/id/ru/tr/vi...). */
+export function decimalSeparator(locale: string): "." | "," {
+  const d = new Intl.NumberFormat(locale).formatToParts(1.1).find((p) => p.type === "decimal")?.value ?? ".";
+  return toAsciiDigits(d) === "," ? "," : ".";
+}
+
+/**
+ * What a person typed, in their locale's conventions, -> canonical "1250.50" for the API.
+ * de: "1.250,50" -> "1250.50"; en: "1,250.50" -> "1250.50"; ar: "١٬٢٥٠٫٥" -> "1250.5".
+ * In decimal-comma locales a lone "." followed by exactly three digits is read as grouping ("1.250" -> 1250).
+ */
+export function normalizeAmountInput(raw: string, locale: string): string {
+  let s = toAsciiDigits(raw).replace(/[\s  '’_]/g, "");
+  if (decimalSeparator(locale) === ",") {
+    if (s.includes(",")) s = s.replace(/\./g, "").replace(",", ".");
+    else if (/^-?\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, "");
+  } else {
+    s = s.replace(/,/g, "");
+  }
+  return s;
+}
+
+/** Minor units -> editable string in the user's convention ("1250,5" for de, "1250.5" for en). */
+export function toInputString(minor: Minor, currency: string, locale: string): string {
+  const s = toDecimalString(minor, currency);
+  return decimalSeparator(locale) === "," ? s.replace(".", ",") : s;
 }
 
 /** Minor units -> plain decimal string for inputs and CSV ("1250.5", "-300", "1500" for JPY). */

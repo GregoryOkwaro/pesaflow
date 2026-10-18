@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState, type FormEvent } from "react"
 import { useT } from "@/i18n/client";
 import { api, ApiClientError } from "@/lib/api";
 import { CURRENCY_CODES, currencyName } from "@/lib/countries";
-import { currencyExponent, formatMoney, toDecimalString } from "@/lib/money";
+import { currencyExponent, formatMoney, normalizeAmountInput, toInputString } from "@/lib/money";
 import { loadPaddle, paddleLocale, setPaddleEventHandler } from "./paddle";
 import type { Account, BudgetPayload, Item, Me, Payment, PaymentConfig, Plan } from "./types";
 import { FormError, Modal, useFmt } from "./ui";
@@ -20,7 +20,7 @@ const amountPattern = (currency: string, signed: boolean) => {
 export function ItemDialog({ data, item, onSaved, onDelete, onClose }: {
   data: BudgetPayload; item?: Item; onSaved: (d: BudgetPayload, msg: string) => void; onDelete: (item: Item) => void; onClose: () => void;
 }) {
-  const { t } = useT();
+  const { t, locale } = useT();
   const cur = data.budget.currency;
   const isNew = !item;
   const presets: [string, string][] = [["0", t("itemDialog.once")], ["1", t("itemDialog.daily")], ["7", t("itemDialog.weekly")], ["14", t("itemDialog.fortnightly")], ["30", t("itemDialog.monthly")]];
@@ -34,7 +34,7 @@ export function ItemDialog({ data, item, onSaved, onDelete, onClose }: {
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const f = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
-    const raw = (f.amount ?? "").replace(/[,\s  ']/g, "");
+    const raw = normalizeAmountInput(f.amount ?? "", locale);
     if (raw && !amountPattern(cur, false).test(raw)) {
       return setError(currencyExponent(cur) === 0 || raw.includes(".")
         ? t("errors.amountDecimals", { currency: cur, decimals: currencyExponent(cur) }) : t("errors.amountInvalid"));
@@ -68,7 +68,7 @@ export function ItemDialog({ data, item, onSaved, onDelete, onClose }: {
             </div>
           </div>
           <input name="amount" type="text" inputMode="decimal" aria-label={t("itemDialog.amount", { currency: cur })} placeholder={t("itemDialog.amount", { currency: cur })}
-            defaultValue={item?.amount ? toDecimalString(Math.abs(item.amount), cur) : ""} />
+            defaultValue={item?.amount ? toInputString(Math.abs(item.amount), cur, locale) : ""} />
         </div>
         <div className="row2">
           <label className="field"><span>{t("itemDialog.due")}</span><input name="valueDate" type="date" defaultValue={item ? item.valueDate ?? "" : data.projection.today} />
@@ -114,14 +114,14 @@ export function ItemDialog({ data, item, onSaved, onDelete, onClose }: {
 export function AccountDialog({ budgetId, currency, account, onSaved, onDelete, onClose }: {
   budgetId: string; currency: string; account?: Account; onSaved: (d: BudgetPayload, msg: string) => void; onDelete: (a: Account) => void; onClose: () => void;
 }) {
-  const { t } = useT();
+  const { t, locale } = useT();
   const isNew = !account;
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const f = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
-    const raw = (f.balance ?? "").replace(/[,\s  ']/g, "");
+    const raw = normalizeAmountInput(f.balance ?? "", locale);
     if (raw && !amountPattern(currency, true).test(raw)) return setError(t("errors.amountInvalid"));
     setBusy(true);
     try {
@@ -139,7 +139,7 @@ export function AccountDialog({ budgetId, currency, account, onSaved, onDelete, 
         <FormError message={error} />
         <label className="field"><span>{t("accountDialog.name")}</span><input name="name" type="text" defaultValue={account?.name} placeholder={t("accountDialog.namePlaceholder")} required maxLength={60} /></label>
         <label className="field"><span>{t("accountDialog.balance", { currency })}</span>
-          <input name="balance" type="text" inputMode="decimal" defaultValue={account ? toDecimalString(account.balance, currency) : "0"} />
+          <input name="balance" type="text" inputMode="decimal" defaultValue={account ? toInputString(account.balance, currency, locale) : "0"} />
           <div className="hint">{t("accountDialog.balanceHint")}</div></label>
         <label className="field"><span>{t("accountDialog.details")}</span><input name="details" type="text" defaultValue={account?.details} maxLength={200} placeholder={t("accountDialog.detailsPlaceholder")} /></label>
         <label className="check"><input type="checkbox" name="includeInTotal" defaultChecked={account?.includeInTotal ?? true} /> {t("accountDialog.include")}</label>

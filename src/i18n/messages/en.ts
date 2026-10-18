@@ -203,5 +203,13 @@ export const en = {
   },
 };
 
-type DeepString<T> = { [K in keyof T]: T[K] extends string ? string : DeepString<T[K]> };
+/**
+ * Plural groups: English needs `one` and `other`; other languages add the CLDR forms they
+ * use (Arabic: zero/one/two/few/many/other; Russian, Ukrainian, Polish: one/few/many/other;
+ * Chinese, Japanese, Korean, Thai, Vietnamese, Indonesian: other only, `one` just repeats it).
+ */
+export type PluralForms = { zero?: string; one: string; two?: string; few?: string; many?: string; other: string };
+type DeepString<T> = {
+  [K in keyof T]: T[K] extends string ? string : T[K] extends { one: string; other: string } ? PluralForms : DeepString<T[K]>;
+};
 export type Messages = DeepString<typeof en>;
